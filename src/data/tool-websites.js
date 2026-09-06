@@ -3,9 +3,7 @@
 // These are NOT part of the tool dataset — it carries no vendor URL field — so
 // they are maintained here by hand.
 //
-// TODO(verify): confirm each URL before launch. They are well-known product
-// homepages, but nothing here has been checked against the dataset's own
-// sourcing, and a wrong outbound link is a visible error on a public page.
+// Reviewed and approved by the site owner.
 //
 // All outbound links render with rel="nofollow sponsored noopener" so the
 // directory passes no ranking signal to the vendors it lists.

@@ -2,7 +2,13 @@
 import Layout from "../../layouts/Layout.astro";
 import SimpleHeader from "../../components/SimpleHeader.astro";
 import AuthorCard from "../../components/AuthorCard.astro";
-import { GLOSSARY, getGlossaryTerm, toolsForTerm, facetCellFor } from "../../data/glossary.js";
+import {
+  GLOSSARY,
+  getGlossaryTerm,
+  toolsForTerm,
+  facetCellFor,
+  valueForTerm,
+} from "../../data/glossary.js";
 import { getTools, getToolDetail, tierLabelFor } from "../../lib/tools.js";
 import { AUTHOR } from "../../data/author.js";
 
@@ -14,11 +20,19 @@ const { term: slug } = Astro.params;
 const entry = getGlossaryTerm(slug);
 const allTools = getTools();
 
-// Codacy leads any list it qualifies for; the rest follow alphabetically.
+// Tools that fully support the term rank above those that only partly do, and
+// Codacy leads the list only where its own support is full — heading a "top
+// tools" list with a partial implementation would overstate it.
 const matching = toolsForTerm(entry, allTools);
+const byName = (a, b) => a.name.localeCompare(b.name);
+const isPartial = (t) => valueForTerm(entry, t) === "partial";
+const fullSupport = matching.filter((t) => !isPartial(t));
+const partialSupport = matching.filter(isPartial);
+
 const ranked = [
-  ...matching.filter((t) => t.slug === "codacy"),
-  ...matching.filter((t) => t.slug !== "codacy").sort((a, b) => a.name.localeCompare(b.name)),
+  ...fullSupport.filter((t) => t.slug === "codacy"),
+  ...fullSupport.filter((t) => t.slug !== "codacy").sort(byName),
+  ...partialSupport.sort(byName),
 ].map((t) => {
   const raw = getToolDetail(t.slug);
   const cell = facetCellFor(entry, raw);

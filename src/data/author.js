@@ -1,10 +1,8 @@
-// Byline shown on glossary articles.
-// TODO(verify): confirm the LinkedIn URL before this goes live — the GitHub
-// handle is known, the LinkedIn slug is a guess.
+// Byline shown on glossary articles. URLs confirmed by the author.
 export const AUTHOR = {
   name: "Cláudia Fernandes",
   initials: "CF",
   bio: "Geek wannabe; AKA Claude-ia.",
-  linkedin: "https://www.linkedin.com/in/claudia-fernandes/",
+  linkedin: "https://www.linkedin.com/in/claudiacsf/",
   github: "https://github.com/ccsfcodacy",
 };

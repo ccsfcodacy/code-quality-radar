@@ -1,14 +1,16 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import SimpleHeader from "../../components/SimpleHeader.astro";
-import { GLOSSARY, GLOSSARY_GROUPS, splitToolsForTerm } from "../../data/glossary.js";
+import { GLOSSARY, GLOSSARY_GROUPS, toolsForTerm } from "../../data/glossary.js";
 import { getTools } from "../../lib/tools.js";
 
 const tools = getTools();
-const entries = GLOSSARY.map((t) => {
-  const { all, partial } = splitToolsForTerm(t, tools);
-  return { ...t, toolCount: all.length, partialCount: partial.length };
-}).sort((a, b) => a.term.localeCompare(b.term));
+// The full/partial split belongs on the article, where there is room to
+// explain it. On a dense card grid it reads as noise.
+const entries = GLOSSARY.map((t) => ({
+  ...t,
+  toolCount: toolsForTerm(t, tools).length,
+})).sort((a, b) => a.term.localeCompare(b.term));
 
 const groupsInUse = GLOSSARY_GROUPS.filter((g) => entries.some((e) => e.group === g));
 
@@ -78,10 +80,7 @@ const jsonLd = {
             <span class="glossary-card-term">{e.term}</span>
             <span class="glossary-card-short">{e.short}</span>
             <span class="glossary-card-foot">
-              <span>
-                {e.toolCount} {e.toolCount === 1 ? "tool" : "tools"}
-                {e.partialCount > 0 && <span class="glossary-card-partial">{e.partialCount} partial</span>}
-              </span>
+              <span>{e.toolCount} {e.toolCount === 1 ? "tool" : "tools"}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
             </span>
           </a>

@@ -204,7 +204,7 @@ p, .body  { font-size: 16px; font-weight: 400; line-height: 1.55; margin: 0; }
   font-weight: 500;
   color: var(--text-primary);
 }
-.logo svg { width: 28px; height: 28px; }
+.logo svg { width: 28px; height: 28px; margin-left: -5px; }
 .logo-spin {
   animation: logo-spin 6s linear infinite;
   transform-box: view-box;
@@ -316,7 +316,7 @@ p, .body  { font-size: 16px; font-weight: 400; line-height: 1.55; margin: 0; }
   gap: var(--space-sm);
 }
 .directory-header .logo { font-size: 16px; }
-.directory-header .logo svg { width: 34px; height: 34px; }
+.directory-header .logo svg { width: 34px; height: 34px; margin-left: -6px; }
 
 /* Hero search (per-request: present but understated) */
 .hero-search-wrap { padding: var(--space-lg) 0; }
@@ -880,12 +880,6 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
 /* .results-count sits inside .results-bar on the directory, which supplies the
    gap. Standalone (glossary index) it needs its own. */
 .results-count.is-standalone { margin-bottom: var(--space-lg); }
-.glossary-card-partial {
-  color: var(--warning);
-  margin-left: var(--space-xs);
-  padding-left: var(--space-xs);
-  border-left: 1px solid var(--border-hover);
-}
 
 /* The browser default selection colour sits too close to the muted body text
    to stay legible on this dark palette. */
@@ -920,10 +914,6 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
   display: inline-flex;
   align-items: center;
   color: var(--text-tertiary);
-  /* The logo mark's circle sits further inside its viewBox than the house path
-     does inside its own, so equal boxes still read as misaligned. Nudge the ink
-     to line up with the wordmark above. */
-  margin-left: 4px;
 }
 .breadcrumb-home svg { width: 15px; height: 15px; }
 .breadcrumb-home:hover { color: var(--accent-text); }
