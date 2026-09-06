@@ -1,0 +1,327 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SimpleHeader from "../components/SimpleHeader.astro";
+import FacetRow from "../components/FacetRow.astro";
+import {
+  getTools,
+  getToolDetail,
+  getAllSlugs,
+  getSimilarTools,
+  WORKFLOW_STAGE_FACETS,
+  DETECTION_FACETS,
+  AI_CAPABILITY_FACETS,
+  COMPLIANCE_BOOL_FACETS,
+  GIT_PROVIDER_FACETS,
+  API_CLI_FACETS,
+  BEST_FIT_BUYER_LABELS,
+  PRICING_MODEL_LABELS,
+} from "../lib/tools.js";
+
+export function getStaticPaths() {
+  return getAllSlugs().map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const tool = getToolDetail(slug);
+const allTools = getTools();
+const similar = getSimilarTools(tool, allTools, 4);
+
+function ok(v) {
+  return v === "yes" || v === "partial";
+}
+function joinList(arr, max = 8) {
+  if (!arr || !arr.length) return "";
+  const shown = arr.slice(0, max).join(", ");
+  return arr.length > max ? `${shown}, and ${arr.length - max} more` : shown;
+}
+
+const langCount = (typeof tool.languages?.count_claimed === "number" ? tool.languages.count_claimed : 0) || tool.languages?.list?.length || 0;
+const buyerLabels = (tool.fit_signals?.best_fit_buyer || []).map((b) => BEST_FIT_BUYER_LABELS[b] || b);
+const gitLabels = GIT_PROVIDER_FACETS.filter((f) => ok(tool.integrations?.git_providers?.[f.key])).map((f) => f.label);
+
+const faqs = [
+  {
+    q: `When should you choose ${tool.name}?`,
+    a: `${tool.name} best fits ${joinList(buyerLabels, 5) || "teams evaluating this category"}${
+      tool.fit_signals?.best_fit_team_size ? ` — ${tool.fit_signals.best_fit_team_size}.` : "."
+    }${tool.fit_signals?.notable_strengths?.[0] ? ` ${tool.fit_signals.notable_strengths[0]}` : ""}`,
+  },
+  {
+    q: `What languages does ${tool.name} support?`,
+    a: langCount
+      ? `${tool.name} supports ${langCount}+ languages and frameworks, including ${joinList(tool.languages.list, 10)}.`
+      : `Language support for ${tool.name} is not documented in the sources reviewed.`,
+  },
+  {
+    q: `What does ${tool.name} integrate with?`,
+    a: `${tool.name} integrates with ${joinList(gitLabels, 7) || "the git providers documented above"} for source control${
+      tool.integrations?.ci_systems?.length ? `, CI systems including ${joinList(tool.integrations.ci_systems, 5)}` : ""
+    }${tool.integrations?.ides?.length ? `, and IDEs including ${joinList(tool.integrations.ides, 5)}` : ""}.`,
+  },
+  {
+    q: `What tools are similar to ${tool.name}?`,
+    a: similar.length
+      ? `Similar ${tool.categoryLabel} tools tracked here include ${similar.map((s) => s.name).join(", ")}.`
+      : `No other tools in the ${tool.categoryLabel} category are currently tracked.`,
+  },
+  {
+    q: `What are ${tool.name}'s plans and pricing?`,
+    a: `${tool.name} ${tool.commercial?.free_tier?.v === "yes" ? "offers a free tier, with paid plans" : "has paid plans"} ${
+      tool.priceLabel !== "Contact for pricing" ? `starting around ${tool.priceLabel}` : "available by contacting the vendor"
+    }${tool.commercial?.enterprise_quote_only?.v === "yes" ? "; enterprise pricing is quote-only" : ""}.`,
+  },
+];
+
+const jsonLdApp = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: tool.name,
+  description: tool.one_liner,
+  applicationCategory: tool.categoryLabel,
+  ...(tool.commercial?.free_tier?.v === "yes"
+    ? { offers: { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free tier" } }
+    : {}),
+};
+const jsonLdFaq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+<Layout title={`${tool.name} — Review Radar`} description={tool.one_liner}>
+  <SimpleHeader slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdApp)} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdFaq)} />
+
+  <div class="container">
+    <div style="padding-top: var(--space-lg);">
+      <a href="/" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        All tools
+      </a>
+    </div>
+
+    <section class="tool-hero">
+      <div class="tool-hero-main">
+        <span class="tool-hero-avatar">{tool.name.charAt(0).toUpperCase()}</span>
+        <div>
+          <p class="label section-label" style="margin-bottom: var(--space-2xs);">{tool.categoryLabel}</p>
+          <h1 class="h1">{tool.name}</h1>
+          <p class="text-secondary body-lg" style="margin-top: var(--space-sm); max-width: 640px;">{tool.one_liner}</p>
+        </div>
+      </div>
+      <div class="tool-hero-side">
+        <span class="body-sm text-secondary">{tool.priceLabel}</span>
+        <span class="caption">Last verified {tool.lastUpdated}</span>
+      </div>
+    </section>
+
+    <div class="quick-facts-grid">
+      <div class="quick-fact">
+        <p class="label quick-fact-label">Deployment</p>
+        <p class="quick-fact-value">
+          {[
+            ok(tool.deployment?.saas_cloud?.v) && "Cloud",
+            ok(tool.deployment?.self_hosted?.v) && "Self-Hosted",
+            ok(tool.deployment?.air_gapped?.v) && "Air-Gapped",
+          ].filter(Boolean).join(" · ") || "Not documented"}
+        </p>
+      </div>
+      <div class="quick-fact">
+        <p class="label quick-fact-label">Languages</p>
+        <p class="quick-fact-value">{langCount ? `${langCount}+` : "Not documented"}</p>
+      </div>
+      <div class="quick-fact">
+        <p class="label quick-fact-label">Pricing model</p>
+        <p class="quick-fact-value">{(tool.commercial?.pricing_models || []).map((m) => PRICING_MODEL_LABELS[m] || m).join(", ") || "Not documented"}</p>
+      </div>
+      <div class="quick-fact">
+        <p class="label quick-fact-label">Free tier</p>
+        <p class="quick-fact-value">{tool.commercial?.free_tier?.v === "yes" ? "Yes" : tool.commercial?.free_tier?.v === "partial" ? "Partial" : "No"}</p>
+      </div>
+    </div>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">Workflow coverage</h2>
+        <p class="text-secondary" style="margin-top: var(--space-xs);">Where in the development lifecycle {tool.name} operates.</p>
+      </div>
+      <div class="facet-grid">
+        {WORKFLOW_STAGE_FACETS.map((f) => <FacetRow label={f.label} cell={tool.workflow_stages?.[f.key]} />)}
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">Analysis &amp; detection</h2>
+        <p class="text-secondary" style="margin-top: var(--space-xs);">Every detection and code-analysis capability tracked for {tool.name}.</p>
+      </div>
+      <div class="facet-grid">
+        {DETECTION_FACETS.map((f) => <FacetRow label={f.label} cell={tool.detection?.[f.key]} />)}
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">AI capabilities</h2>
+      </div>
+      <div class="facet-grid">
+        {AI_CAPABILITY_FACETS.map((f) => <FacetRow label={f.label} cell={tool.ai_posture?.[f.key]} />)}
+      </div>
+      {tool.ai_posture?.models_used?.length > 0 && (
+        <div style="margin-top: var(--space-lg);">
+          <p class="label quick-fact-label" style="margin-bottom: var(--space-sm);">Models used</p>
+          <div class="chip-list">
+            {tool.ai_posture.models_used.map((m) => <span class="chip">{m}</span>)}
+          </div>
+        </div>
+      )}
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">Compliance &amp; governance</h2>
+      </div>
+      <div class="facet-grid">
+        {COMPLIANCE_BOOL_FACETS.map((f) => <FacetRow label={f.label} cell={tool.compliance?.[f.key]} />)}
+      </div>
+      {tool.compliance?.certifications?.length > 0 && (
+        <div style="margin-top: var(--space-lg);">
+          <p class="label quick-fact-label" style="margin-bottom: var(--space-sm);">Certifications</p>
+          <div class="chip-list">
+            {tool.compliance.certifications.map((c) => <span class="chip">{c}</span>)}
+          </div>
+        </div>
+      )}
+      {tool.compliance?.standards_mapping?.length > 0 && (
+        <div style="margin-top: var(--space-lg);">
+          <p class="label quick-fact-label" style="margin-bottom: var(--space-sm);">Standards mapping</p>
+          <div class="chip-list">
+            {tool.compliance.standards_mapping.map((c) => <span class="chip">{c}</span>)}
+          </div>
+        </div>
+      )}
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">Integrations</h2>
+      </div>
+      <div class="facet-grid">
+        {GIT_PROVIDER_FACETS.map((f) => <FacetRow label={f.label} cell={tool.integrations?.git_providers?.[f.key]} />)}
+        {API_CLI_FACETS.map((f) => <FacetRow label={f.label} cell={tool.integrations?.api_cli?.[f.key]} />)}
+      </div>
+      {["ci_systems", "ides", "issue_trackers", "chat_notifications"].map((key) => {
+        const labels = { ci_systems: "CI/CD systems", ides: "IDEs", issue_trackers: "Issue trackers", chat_notifications: "Chat & notifications" };
+        const list = tool.integrations?.[key];
+        return list?.length > 0 && (
+          <div style="margin-top: var(--space-lg);">
+            <p class="label quick-fact-label" style="margin-bottom: var(--space-sm);">{labels[key]}</p>
+            <div class="chip-list">
+              {list.map((v) => <span class="chip">{v}</span>)}
+            </div>
+          </div>
+        );
+      })}
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">Pricing &amp; plans</h2>
+        {tool.commercial?.entry_paid_price && tool.commercial.entry_paid_price !== "unknown" && (
+          <p class="text-secondary" style="margin-top: var(--space-xs);">{tool.commercial.entry_paid_price}</p>
+        )}
+        {tool.commercial?.minimum_seats && (
+          <p class="caption" style="margin-top: var(--space-xs);">Minimum seats: {tool.commercial.minimum_seats}</p>
+        )}
+        {tool.commercial?.trial && tool.commercial.trial !== "unknown" && (
+          <p class="caption" style="margin-top: var(--space-xs);">Trial: {typeof tool.commercial.trial === "string" ? tool.commercial.trial : tool.commercial.trial.note}</p>
+        )}
+      </div>
+      {tool.commercial?.plans?.length > 0 && (
+        <div class="plans-grid">
+          {tool.commercial.plans.map((plan) => (
+            <div class="plan-card">
+              <span class="plan-name">{plan.name}</span>
+              <span class="plan-price">{plan.price}</span>
+              {plan.who_for && <span class="plan-who">{plan.who_for}</span>}
+              {plan.key_inclusions?.length > 0 && (
+                <ul class="plan-list">
+                  {plan.key_inclusions.map((i) => <li>{i}</li>)}
+                </ul>
+              )}
+              {plan.key_limits?.length > 0 && (
+                <ul class="plan-list limits">
+                  {plan.key_limits.map((i) => <li>{i}</li>)}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+
+    {(tool.fit_signals?.notable_strengths?.length > 0 || tool.fit_signals?.notable_limitations?.length > 0) && (
+      <section class="detail-section">
+        <div class="detail-section-head">
+          <h2 class="h2">Who it's for</h2>
+          {tool.fit_signals?.best_fit_team_size && (
+            <p class="text-secondary" style="margin-top: var(--space-xs);">{tool.fit_signals.best_fit_team_size}</p>
+          )}
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-xl);">
+          {tool.fit_signals?.notable_strengths?.length > 0 && (
+            <div>
+              <p class="label quick-fact-label" style="margin-bottom: var(--space-md);">Notable strengths</p>
+              <ul class="fit-list strengths">
+                {tool.fit_signals.notable_strengths.map((s) => <li>{s}</li>)}
+              </ul>
+            </div>
+          )}
+          {tool.fit_signals?.notable_limitations?.length > 0 && (
+            <div>
+              <p class="label quick-fact-label" style="margin-bottom: var(--space-md);">Notable limitations</p>
+              <ul class="fit-list limitations">
+                {tool.fit_signals.notable_limitations.map((s) => <li>{s}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      </section>
+    )}
+
+    {similar.length > 0 && (
+      <section class="detail-section">
+        <div class="detail-section-head">
+          <h2 class="h2">Similar tools</h2>
+          <p class="text-secondary" style="margin-top: var(--space-xs);">Other {tool.categoryLabel} tools in the directory.</p>
+        </div>
+        <div class="similar-grid">
+          {similar.map((s) => (
+            <a href={`/${s.slug}`} class="similar-card">
+              <span class="similar-name">{s.name}</span>
+              <span class="similar-desc">{s.description}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="detail-section">
+      <div class="detail-section-head">
+        <h2 class="h2">FAQ</h2>
+      </div>
+      {faqs.map((f) => (
+        <div class="faq-item">
+          <h3 class="faq-question">{f.q}</h3>
+          <p class="faq-answer">{f.a}</p>
+        </div>
+      ))}
+    </section>
+  </div>
+</Layout>

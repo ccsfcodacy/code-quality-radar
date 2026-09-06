@@ -1,0 +1,124 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SimpleHeader from "../components/SimpleHeader.astro";
+---
+<Layout
+  title="About — Review Radar"
+  description="Review Radar is a directory of code quality, security, and review tools, tracked against public documentation so engineers can compare capabilities without wading through marketing pages."
+>
+  <SimpleHeader slot="header" />
+
+  <section class="section" style="padding-top: var(--space-4xl); position: relative; overflow: hidden;">
+    <div class="container" style="max-width: 760px;">
+      <p class="label section-label">About</p>
+      <h1 class="h1">A directory for finding the right code review tool — not the loudest one.</h1>
+      <p class="body-lg text-secondary" style="margin-top: var(--space-lg);">
+        Review Radar tracks code quality, static analysis, security scanning, and AI-assisted
+        review tools side by side, so you can filter by what a tool actually does instead of
+        reading twenty marketing pages to find out.
+      </p>
+    </div>
+    <svg aria-hidden="true" width="360" height="360" viewBox="0 0 360 360" style="position:absolute; right:-90px; top:-40px; opacity:0.35; pointer-events:none;">
+      <circle cx="180" cy="180" r="160" stroke="#1E2A40" stroke-width="1" fill="none"/>
+      <circle cx="180" cy="180" r="115" stroke="#1E2A40" stroke-width="1" fill="none"/>
+      <circle cx="180" cy="180" r="70" stroke="#4AB0B5" stroke-width="1" stroke-dasharray="3 4" fill="none"/>
+      <line x1="180" y1="20" x2="180" y2="340" stroke="#141E30" stroke-width="1"/>
+      <line x1="20" y1="180" x2="340" y2="180" stroke="#141E30" stroke-width="1"/>
+      <circle cx="235" cy="150" r="3" fill="#6ECDD2"/>
+      <circle cx="150" cy="230" r="2" fill="#4AB0B5"/>
+    </svg>
+  </section>
+
+  <hr class="divider" />
+
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <p class="label section-label">Why this exists</p>
+      <h2 class="h2">The category won't hold still.</h2>
+      <hr class="rule-short" />
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        New static analysis, security scanning, and AI-assisted review tools ship every month.
+        Existing ones change what's free versus what's gated behind an enterprise tier, add a
+        language, drop a deployment option. Almost every vendor page is written to sell, which
+        makes it a bad instrument for comparison — the page that says "supports everything" and
+        the page that lists an actual limitation read identically confident.
+      </p>
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        Review Radar exists to answer a narrower, more useful question: does this specific tool
+        support what you need, on the plan you'd actually pay for.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <p class="label section-label">What we track</p>
+      <h2 class="h2">Capabilities, not categories.</h2>
+      <hr class="rule-short" />
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        Every tool in the directory is broken down into the same set of filterable facets, so a
+        SAST scanner and an AI review agent can be compared on equal terms where they actually
+        overlap:
+      </p>
+      <div style="display:flex; flex-wrap:wrap; gap: var(--space-xs); margin-top: var(--space-lg);">
+        <span class="pill">Code Quality</span>
+        <span class="pill">SAST</span>
+        <span class="pill">SCA</span>
+        <span class="pill">Secrets Detection</span>
+        <span class="pill">IaC</span>
+        <span class="pill">AI Code Review</span>
+        <span class="pill">PR Analysis</span>
+        <span class="pill">Testing</span>
+        <span class="pill">Code Coverage</span>
+        <span class="pill">Linting</span>
+      </div>
+      <p class="text-secondary" style="margin-top: var(--space-lg);">
+        Alongside category, each entry also carries the detail that actually decides a shortlist:
+        supported languages, integrations, deployment model (cloud, self-hosted, air-gapped), and
+        which plan tier a capability requires — because "the tool can do it" and "the tool can do
+        it on the plan you're evaluating" are different facts.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <p class="label section-label">How entries stay current</p>
+      <h2 class="h2">Checked against the vendor's own documentation.</h2>
+      <hr class="rule-short" />
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        Each entry is reviewed directly against public sources — product docs, pricing pages,
+        changelogs, and release notes — not against marketing copy or secondhand summaries. A
+        capability is only marked as supported when it's documented; if a vendor's docs are
+        silent on something, that's recorded as unknown rather than assumed either way.
+      </p>
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        Tools move fast, so entries are re-checked on a rolling basis rather than once and
+        forgotten. Every tool page shows when it was last verified, so you can judge for yourself
+        whether it's still fresh enough to act on.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <p class="label section-label">Who it's for</p>
+      <h2 class="h2">Built for the person doing the evaluation.</h2>
+      <hr class="rule-short" />
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        Engineers, security teams, and platform leads narrowing down a tool during a procurement
+        cycle, a migration, or a compliance push. If you already know roughly what you need and
+        want to check who actually offers it, that's what this is for.
+      </p>
+      <div style="margin-top: var(--space-xl);">
+        <a href="/" class="btn btn-primary">Browse tools</a>
+      </div>
+    </div>
+  </section>
+</Layout>

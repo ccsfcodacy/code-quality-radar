@@ -1,0 +1,274 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Logo from "../components/Logo.astro";
+import FilterGroup from "../components/FilterGroup.astro";
+import {
+  getTools,
+  getFacetOptions,
+  GIT_PROVIDER_FACETS,
+  WORKFLOW_STAGE_FACETS,
+  DETECTION_FACETS,
+  AI_CAPABILITY_FACETS,
+  COMPLIANCE_BOOL_FACETS,
+} from "../lib/tools.js";
+
+const tools = getTools().sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated) || a.name.localeCompare(b.name));
+const facets = getFacetOptions(tools);
+const totalCount = tools.length;
+
+function tokenStr(obj) {
+  return Object.entries(obj)
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+    .join(" ");
+}
+function pipeStr(arr) {
+  return `|${arr.join("|")}|`;
+}
+function labelsOf(defs, obj) {
+  return defs.filter((f) => obj[f.key]).map((f) => f.label);
+}
+
+// Groups whose values are free text (may contain spaces) are matched via
+// pipe-delimited membership; everything else is a space-separated token list.
+const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers", "chat"];
+---
+<Layout
+  title="Review Radar — Code Quality, AppSec &amp; PR Review Tools"
+  description="A directory of code quality, static analysis, security scanning, and AI-assisted code review tools. Filter by category, language, deployment model, compliance, integrations, and pricing."
+>
+  <header class="site-header directory-header" slot="header">
+    <div class="container">
+      <Logo />
+      <h1 class="directory-h1">Unbiased code quality, security and code review tool directory</h1>
+    </div>
+  </header>
+
+  <section class="hero-search-wrap">
+    <div class="container">
+      <div class="hero-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search tools, categories, languages, integrations…" autocomplete="off" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="directory-layout">
+        <aside class="filters-panel">
+          <div class="filters-panel-head">
+            <h3 class="h4">Filters</h3>
+            <button type="button" id="clearFilters">Clear all</button>
+          </div>
+
+          <FilterGroup title="Category" groupKey="category" options={facets.categories} open={true} />
+          <FilterGroup title="Deployment" groupKey="deployment" options={facets.deployment} open={true} />
+          <FilterGroup title="Pricing Model" groupKey="pricingmodel" options={facets.pricingModels} open={true} />
+          <FilterGroup title="Pricing & Trial" groupKey="pricingbool" options={facets.pricingBool} open={true} />
+          <FilterGroup title="Pricing Transparency" groupKey="pricetransparency" options={facets.priceTransparency} open={false} />
+          <FilterGroup title="Git Hosting Platform" groupKey="git" options={facets.gitProviders} open={false} />
+          <FilterGroup title="Workflow Stage" groupKey="workflow" options={facets.workflowStages} open={false} />
+          <FilterGroup title="Analysis & Detection" groupKey="detection" options={facets.detectionTypes} searchable={true} open={false} />
+          <FilterGroup title="AI Capabilities" groupKey="ai" options={facets.aiCapabilities} open={false} />
+          <FilterGroup title="Compliance & Governance" groupKey="compliance" options={facets.complianceBool} open={false} />
+          <FilterGroup title="Certifications" groupKey="certifications" options={facets.certifications} searchable={true} open={false} />
+          <FilterGroup title="API & CLI Access" groupKey="apicli" options={facets.apiCli} open={false} />
+          <FilterGroup title="Languages" groupKey="languages" options={facets.languages} searchable={true} open={false} />
+          <FilterGroup title="IDE Support" groupKey="ides" options={facets.ides} searchable={true} open={false} />
+          <FilterGroup title="CI/CD System" groupKey="ci" options={facets.ciSystems} searchable={true} open={false} />
+          <FilterGroup title="Issue Tracker" groupKey="issuetrackers" options={facets.issueTrackers} searchable={true} open={false} />
+          <FilterGroup title="Chat & Notifications" groupKey="chat" options={facets.chatNotifications} searchable={true} open={false} />
+        </aside>
+
+        <div>
+          <div class="results-bar">
+            <p class="results-count" id="resultsCount">
+              Showing <b id="visibleCount">{totalCount}</b> of {totalCount} tools
+            </p>
+            <label class="sort-control">
+              Sort by
+              <select id="sortSelect">
+                <option value="updated" selected>Last updated</option>
+                <option value="name-asc">Name (A–Z)</option>
+                <option value="name-desc">Name (Z–A)</option>
+              </select>
+            </label>
+          </div>
+          <div class="tool-grid" id="toolGrid">
+            {tools.map((t) => {
+              const searchParts = [
+                t.name,
+                t.categoryLabel,
+                t.description,
+                ...t.languages,
+                ...t.tags,
+                ...labelsOf(GIT_PROVIDER_FACETS, t.gitProviders),
+                ...labelsOf(WORKFLOW_STAGE_FACETS, t.workflowStages),
+                ...labelsOf(DETECTION_FACETS, t.detection),
+                ...labelsOf(AI_CAPABILITY_FACETS, t.aiCapabilities),
+                ...labelsOf(COMPLIANCE_BOOL_FACETS, t.complianceBool),
+                ...t.certifications,
+                ...t.ides,
+                ...t.ciSystems,
+                ...t.issueTrackers,
+                ...t.chatNotifications,
+              ];
+              return (
+                <a
+                  href={`/${t.slug}`}
+                  class="tool-card"
+                  data-slug={t.slug}
+                  data-category={t.category}
+                  data-deployment={tokenStr(t.deployment)}
+                  data-git={tokenStr(t.gitProviders)}
+                  data-workflow={tokenStr(t.workflowStages)}
+                  data-detection={tokenStr(t.detection)}
+                  data-ai={tokenStr(t.aiCapabilities)}
+                  data-compliance={tokenStr(t.complianceBool)}
+                  data-apicli={tokenStr(t.apiCli)}
+                  data-pricingmodel={t.pricingModels.join(" ")}
+                  data-pricingbool={[
+                    t.freeTier && "freeTier",
+                    t.freeForOpenSource && "freeForOpenSource",
+                    t.hasTrial && "hasTrial",
+                    t.enterpriseQuoteOnly && "enterpriseQuoteOnly",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  data-pricetransparency={t.priceTransparency}
+                  data-languages={pipeStr(t.languages)}
+                  data-certifications={pipeStr(t.certifications)}
+                  data-ides={pipeStr(t.ides)}
+                  data-ci={pipeStr(t.ciSystems)}
+                  data-issuetrackers={pipeStr(t.issueTrackers)}
+                  data-chat={pipeStr(t.chatNotifications)}
+                  data-search={searchParts.join(" ").toLowerCase()}
+                  data-name={t.name.toLowerCase()}
+                  data-lastupdated={t.lastUpdated}
+                >
+                  <div class="tool-card-head">
+                    <p class="tool-category-label">{t.categoryLabel}</p>
+                    <div class="tool-name-row">
+                      <span class="tool-avatar">{t.initial}</span>
+                      <span class="tool-name">{t.name}</span>
+                    </div>
+                  </div>
+                  <p class="tool-desc">{t.description}</p>
+                  <div class="tool-tags">
+                    {t.tags.map((tag) => <span class="pill">{tag}</span>)}
+                  </div>
+                  <div class="tool-footer">
+                    <span class="tool-price">{t.priceLabel}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+          <p class="no-results" id="noResults" hidden>No tools match these filters.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script define:vars={{ pipeGroups: PIPE_GROUPS }}>
+    const searchInput = document.getElementById("searchInput");
+    const clearBtn = document.getElementById("clearFilters");
+    const sortSelect = document.getElementById("sortSelect");
+    const toolGrid = document.getElementById("toolGrid");
+    const cards = Array.from(document.querySelectorAll(".tool-card"));
+    const visibleCountEl = document.getElementById("visibleCount");
+    const noResultsEl = document.getElementById("noResults");
+    const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-filter-group]'));
+    const pipeGroupSet = new Set(pipeGroups);
+
+    function applySort() {
+      const mode = sortSelect?.value || "updated";
+      const sorted = [...cards].sort((a, b) => {
+        if (mode === "name-asc") return a.dataset.name.localeCompare(b.dataset.name);
+        if (mode === "name-desc") return b.dataset.name.localeCompare(a.dataset.name);
+        return b.dataset.lastupdated.localeCompare(a.dataset.lastupdated) || a.dataset.name.localeCompare(b.dataset.name);
+      });
+      for (const card of sorted) toolGrid.appendChild(card);
+    }
+    sortSelect?.addEventListener("change", applySort);
+
+    function selectedByGroup() {
+      const map = {};
+      for (const cb of checkboxes) {
+        if (!cb.checked) continue;
+        const group = cb.dataset.filterGroup;
+        (map[group] ||= new Set()).add(cb.dataset.value);
+      }
+      return map;
+    }
+
+    function cardMatchesGroup(card, group, value) {
+      const raw = card.dataset[group];
+      if (raw === undefined) return false;
+      return pipeGroupSet.has(group) ? raw.includes(`|${value}|`) : raw.split(" ").includes(value);
+    }
+
+    function cardMatchesSelection(card, selected, query, skipGroup) {
+      if (query && !card.dataset.search.includes(query)) return false;
+      for (const [group, values] of Object.entries(selected)) {
+        if (group === skipGroup) continue;
+        if (!Array.from(values).some((v) => cardMatchesGroup(card, group, v))) return false;
+      }
+      return true;
+    }
+
+    function updateFacetCounts(selected, query) {
+      for (const cb of checkboxes) {
+        const group = cb.dataset.filterGroup;
+        const value = cb.dataset.value;
+        let count = 0;
+        for (const card of cards) {
+          if (!cardMatchesSelection(card, selected, query, group)) continue;
+          if (cardMatchesGroup(card, group, value)) count++;
+        }
+        const countEl = cb.closest(".filter-option")?.querySelector(".filter-count");
+        if (countEl) countEl.textContent = String(count);
+      }
+    }
+
+    function applyFilters() {
+      const selected = selectedByGroup();
+      const query = (searchInput?.value || "").trim().toLowerCase();
+      let visible = 0;
+
+      for (const card of cards) {
+        const match = cardMatchesSelection(card, selected, query, null);
+        card.hidden = !match;
+        if (match) visible++;
+      }
+
+      visibleCountEl.textContent = String(visible);
+      noResultsEl.hidden = visible !== 0;
+      updateFacetCounts(selected, query);
+    }
+
+    searchInput?.addEventListener("input", applyFilters);
+    checkboxes.forEach((cb) => cb.addEventListener("change", applyFilters));
+
+    document.querySelectorAll(".js-inline-search").forEach((input) => {
+      input.addEventListener("input", () => {
+        const q = input.value.trim().toLowerCase();
+        const details = input.closest("details");
+        details?.querySelectorAll(".searchable-option").forEach((el) => {
+          const name = el.dataset.optionName || "";
+          el.style.display = !q || name.includes(q) ? "flex" : "none";
+        });
+      });
+    });
+
+    clearBtn?.addEventListener("click", () => {
+      checkboxes.forEach((cb) => (cb.checked = false));
+      if (searchInput) searchInput.value = "";
+      document.querySelectorAll(".js-inline-search").forEach((input) => (input.value = ""));
+      document.querySelectorAll(".searchable-option").forEach((el) => (el.style.display = "flex"));
+      applyFilters();
+    });
+  </script>
+</Layout>

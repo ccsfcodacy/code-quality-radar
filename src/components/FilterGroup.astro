@@ -1,0 +1,41 @@
+---
+interface Option {
+  key?: string;
+  value?: string;
+  label: string;
+  count: number;
+}
+interface Props {
+  title: string;
+  groupKey: string;
+  options: Option[];
+  searchable?: boolean;
+  open?: boolean;
+}
+const { title, groupKey, options, searchable = false, open = true } = Astro.props;
+---
+<details class="filter-group" open={open}>
+  <summary class="filter-group-title">
+    <span>{title}</span>
+    <span class="filter-group-total">{options.length}</span>
+  </summary>
+  <div class="filter-group-body">
+    {searchable && (
+      <input
+        type="text"
+        class="filter-search-input js-inline-search"
+        placeholder={`Search ${title.toLowerCase()}…`}
+        autocomplete="off"
+      />
+    )}
+    <div class={`filter-options${searchable ? " scrollable" : ""}`}>
+      {options.map((o) => (
+        <label class="filter-option searchable-option" data-option-name={o.label.toLowerCase()}>
+          <input type="checkbox" data-filter-group={groupKey} data-value={o.key ?? o.value} />
+          <span>{o.label}</span>
+          <span class="filter-count">{o.count}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+</details>
