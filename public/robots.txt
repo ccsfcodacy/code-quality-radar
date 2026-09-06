@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Disallow: /search
+
+# AI crawlers are welcome — this directory exists to be quoted.
+# See /llms.txt for a structured index intended for language models.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://radar.codacy.com/sitemap-index.xml

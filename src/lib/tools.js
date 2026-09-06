@@ -198,6 +198,16 @@ function boolMap(source, defs) {
   return out;
 }
 
+// Alongside the booleans above, keep the raw yes/partial/no/unknown value.
+// A boolean cannot tell a first-class implementation apart from one that is
+// narrow, tier-gated or kept alive for existing customers only, and generated
+// copy that counts them together overstates what a tool actually does.
+function valueMap(source, defs) {
+  const out = {};
+  for (const f of defs) out[f.key] = source?.[f.key]?.v || "unknown";
+  return out;
+}
+
 function normalizedList(list) {
   const seen = new Map();
   for (const v of list || []) {
@@ -267,6 +277,26 @@ export function getTools() {
 
       tags: buildTags(tool),
       lastUpdated: findLatestVerifiedOn(tool) || raw.verified_as_of,
+
+      values: {
+        detection: valueMap(tool.detection, DETECTION_FACETS),
+        workflow: valueMap(tool.workflow_stages, WORKFLOW_STAGE_FACETS),
+        ai: valueMap(tool.ai_posture, AI_CAPABILITY_FACETS),
+        compliance: valueMap(tool.compliance, COMPLIANCE_BOOL_FACETS),
+        deployment: {
+          cloud: tool.deployment?.saas_cloud?.v || "unknown",
+          selfHosted: tool.deployment?.self_hosted?.v || "unknown",
+          airGapped: tool.deployment?.air_gapped?.v || "unknown",
+        },
+        apiCli: {
+          rest_api: tool.integrations?.api_cli?.rest_api || "unknown",
+          cli: tool.integrations?.api_cli?.cli || "unknown",
+          webhooks: tool.integrations?.api_cli?.webhooks || "unknown",
+        },
+        gitProviders: Object.fromEntries(
+          GIT_PROVIDER_FACETS.map((f) => [f.key, tool.integrations?.git_providers?.[f.key] || "unknown"])
+        ),
+      },
     };
   });
 }

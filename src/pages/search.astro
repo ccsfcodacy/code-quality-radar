@@ -2,7 +2,12 @@
 import Layout from "../layouts/Layout.astro";
 import SimpleHeader from "../components/SimpleHeader.astro";
 ---
-<Layout title="Search — Review Radar" description="Search the Review Radar directory of code quality, security, and review tools.">
+<Layout
+  title="Search — Review Radar"
+  description="Search the Review Radar directory of code quality, security, and review tools."
+  noindex={true}
+  breadcrumbs={[{ name: "Search", url: "/search" }]}
+>
   <SimpleHeader slot="header" />
   <div class="stub-page">
     <div>

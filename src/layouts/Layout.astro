@@ -1,13 +1,38 @@
 ---
 import Footer from "../components/Footer.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description: string;
-  headerClass?: string;
+  /** Set for pages that should stay out of the index (stubs, thin pages). */
+  noindex?: boolean;
+  /**
+   * Breadcrumb trail *after* Home — Home is prepended here so every page is
+   * consistent. Drives both the visible trail and the BreadcrumbList JSON-LD.
+   */
+  breadcrumbs?: { name: string; url: string }[];
 }
-const { title, description, headerClass = "site-header" } = Astro.props;
+const { title, description, noindex = false, breadcrumbs } = Astro.props;
+
+const trail = breadcrumbs ?? [];
+const fullTrail = [{ name: "Home", url: "/" }, ...trail];
+
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", Astro.site).href;
+
+const breadcrumbLd = trail.length
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: fullTrail.map((b, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: b.name,
+        item: new URL(b.url, Astro.site).href,
+      })),
+    }
+  : null;
 ---
 <!doctype html>
 <html lang="en">
@@ -16,13 +41,33 @@ const { title, description, headerClass = "site-header" } = Astro.props;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex, follow" />}
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Review Radar" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+
   <link rel="icon" href="/favicon.svg" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  {breadcrumbLd && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
 </head>
 <body>
   <slot name="header" />
+  {trail.length > 0 && (
+    <div class="container">
+      <Breadcrumbs trail={trail} />
+    </div>
+  )}
   <main>
     <slot />
   </main>

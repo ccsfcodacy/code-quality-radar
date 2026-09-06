@@ -1,0 +1,173 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SimpleHeader from "../../components/SimpleHeader.astro";
+import AuthorCard from "../../components/AuthorCard.astro";
+import { GLOSSARY, getGlossaryTerm, toolsForTerm, facetCellFor } from "../../data/glossary.js";
+import { getTools, getToolDetail, tierLabelFor } from "../../lib/tools.js";
+import { AUTHOR } from "../../data/author.js";
+
+export function getStaticPaths() {
+  return GLOSSARY.map((t) => ({ params: { term: t.slug } }));
+}
+
+const { term: slug } = Astro.params;
+const entry = getGlossaryTerm(slug);
+const allTools = getTools();
+
+// Codacy leads any list it qualifies for; the rest follow alphabetically.
+const matching = toolsForTerm(entry, allTools);
+const ranked = [
+  ...matching.filter((t) => t.slug === "codacy"),
+  ...matching.filter((t) => t.slug !== "codacy").sort((a, b) => a.name.localeCompare(b.name)),
+].map((t) => {
+  const raw = getToolDetail(t.slug);
+  const cell = facetCellFor(entry, raw);
+  return {
+    ...t,
+    note: cell?.note || t.description,
+    tier: cell ? tierLabelFor(cell) : null,
+    partial: cell?.v === "partial",
+  };
+});
+
+const related = GLOSSARY.filter((t) => t.group === entry.group && t.slug !== entry.slug).slice(0, 6);
+const headline = `What is ${entry.term}?`;
+
+// "Supports" spans a wide range here: a first-class implementation and one kept
+// alive for existing customers both register as support. Split the count so the
+// page never implies parity it cannot evidence.
+const partialCount = ranked.filter((t) => t.partial).length;
+const fullCount = ranked.length - partialCount;
+const parityCaveat =
+  "Support is not the same as parity — some implementations are narrower in scope, gated to a higher plan tier, or maintained only for existing customers. The note under each tool is what its own documentation describes.";
+
+const faqs = [
+  { q: headline, a: entry.short },
+  {
+    q: `How many tools support ${entry.term}?`,
+    a:
+      `${ranked.length} of the ${allTools.length} tools tracked in this directory support ${entry.term}` +
+      (partialCount
+        ? ` — ${fullCount} fully and ${partialCount} partially`
+        : "") +
+      (ranked.length ? `, including ${ranked.slice(0, 5).map((t) => t.name).join(", ")}.` : ".") +
+      ` ${parityCaveat}`,
+  },
+  {
+    q: `What should you look for in ${entry.term}?`,
+    a: entry.lookFor.join(". ") + ".",
+  },
+];
+
+const jsonLdTerm = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTerm",
+  name: entry.term,
+  description: entry.short,
+  inDefinedTermSet: {
+    "@type": "DefinedTermSet",
+    name: "Review Radar Glossary",
+    url: new URL("/glossary", Astro.site).href,
+  },
+};
+const jsonLdArticle = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline,
+  description: entry.short,
+  author: { "@type": "Person", name: AUTHOR.name, url: AUTHOR.linkedin },
+  about: { "@type": "DefinedTerm", name: entry.term },
+};
+const jsonLdFaq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+<Layout
+  title={`${headline} — Review Radar`}
+  description={entry.short}
+  breadcrumbs={[
+    { name: "Glossary", url: "/glossary" },
+    { name: entry.term, url: `/glossary/${entry.slug}` },
+  ]}
+>
+  <SimpleHeader slot="header" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdTerm)} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdArticle)} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdFaq)} />
+
+  <div class="container article-container">
+    <article>
+      <header class="article-head">
+        <p class="label section-label">{entry.group}</p>
+        <h1 class="h1">{headline}</h1>
+        <p class="article-lede">{entry.short}</p>
+      </header>
+
+      <section class="article-section">
+        {entry.long.map((p) => <p class="article-body">{p}</p>)}
+      </section>
+
+      <section class="article-section">
+        <h2 class="h3">Top {ranked.length} {entry.term} {ranked.length === 1 ? "tool" : "tools"}</h2>
+        <p class="text-secondary body-sm" style="margin-top: var(--space-xs);">
+          Every tool in the directory documented as supporting {entry.term}
+          {partialCount > 0 && <> — {fullCount} fully, {partialCount} partially</>}, with what its
+          own documentation says.
+        </p>
+        <p class="caption parity-caveat">{parityCaveat}</p>
+        <ol class="ranked-list">
+          {ranked.map((t, i) => (
+            <li class="ranked-item">
+              <span class="ranked-index">{i + 1}</span>
+              <div class="ranked-body">
+                <div class="ranked-head">
+                  <a href={`/${t.slug}`} class="ranked-name">{t.name}</a>
+                  <span class="pill">{t.categoryLabel}</span>
+                  {t.partial && <span class="facet-status status-partial">Partial</span>}
+                  {t.tier && <span class="pill facet-tier">{t.tier}</span>}
+                </div>
+                <p class="ranked-note">{t.note}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="article-section">
+        <h2 class="h3">What to look for</h2>
+        <ul class="fit-list strengths" style="margin-top: var(--space-md);">
+          {entry.lookFor.map((l) => <li>{l}</li>)}
+        </ul>
+      </section>
+
+      {related.length > 0 && (
+        <section class="article-section">
+          <h2 class="h3">Related terms</h2>
+          <div class="chip-list" style="margin-top: var(--space-md);">
+            {related.map((r) => (
+              <a href={`/glossary/${r.slug}`} class="chip chip-link">{r.term}</a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section class="article-section">
+        <h2 class="h3">FAQ</h2>
+        {faqs.map((f) => (
+          <div class="faq-item">
+            <h3 class="faq-question">{f.q}</h3>
+            <p class="faq-answer">{f.a}</p>
+          </div>
+        ))}
+      </section>
+
+      <AuthorCard />
+    </article>
+  </div>
+</Layout>

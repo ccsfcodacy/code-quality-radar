@@ -1,0 +1,125 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SimpleHeader from "../../components/SimpleHeader.astro";
+import { GLOSSARY, GLOSSARY_GROUPS, splitToolsForTerm } from "../../data/glossary.js";
+import { getTools } from "../../lib/tools.js";
+
+const tools = getTools();
+const entries = GLOSSARY.map((t) => {
+  const { all, partial } = splitToolsForTerm(t, tools);
+  return { ...t, toolCount: all.length, partialCount: partial.length };
+}).sort((a, b) => a.term.localeCompare(b.term));
+
+const groupsInUse = GLOSSARY_GROUPS.filter((g) => entries.some((e) => e.group === g));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  name: "Code quality, security and code review glossary",
+  description:
+    "Plain definitions of the code quality, application security and code review terms used across the Review Radar tool directory.",
+  hasDefinedTerm: entries.map((e) => ({
+    "@type": "DefinedTerm",
+    name: e.term,
+    description: e.short,
+    url: new URL(`/glossary/${e.slug}`, Astro.site).href,
+  })),
+};
+---
+<Layout
+  title="Glossary — Review Radar"
+  description="Plain-English definitions of code quality, AppSec and code review terms — SAST, SCA, IaC scanning, merge gates, self-hosted deployment and more — each with the tools that support it."
+  breadcrumbs={[{ name: "Glossary", url: "/glossary" }]}
+>
+  <SimpleHeader slot="header" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="hero-search-wrap">
+    <div class="container">
+      <p class="label section-label">Glossary</p>
+      <h1 class="h2" style="margin-top: var(--space-2xs);">
+        The vocabulary of code quality, security and review
+      </h1>
+      <p class="text-secondary" style="margin-top: var(--space-sm); max-width: 620px;">
+        {entries.length} terms, each defined plainly and linked to the tools in the directory that
+        actually support it.
+      </p>
+      <div class="hero-search" style="margin-top: var(--space-lg);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="glossarySearch" placeholder="Search terms — try “sast”, “self-hosted”, “merge gate”…" autocomplete="off" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="glossary-filters" id="glossaryFilters">
+        <button type="button" class="group-chip is-active" data-group="all">All <span class="group-chip-count">{entries.length}</span></button>
+        {groupsInUse.map((g) => (
+          <button type="button" class="group-chip" data-group={g}>
+            {g} <span class="group-chip-count">{entries.filter((e) => e.group === g).length}</span>
+          </button>
+        ))}
+      </div>
+
+      <p class="results-count is-standalone" id="glossaryCount">
+        Showing <b id="glossaryVisible">{entries.length}</b> of {entries.length} terms
+      </p>
+
+      <div class="glossary-grid" id="glossaryGrid">
+        {entries.map((e) => (
+          <a
+            href={`/glossary/${e.slug}`}
+            class="glossary-card"
+            data-group={e.group}
+            data-search={`${e.term} ${e.short} ${e.group}`.toLowerCase()}
+          >
+            <span class="label glossary-card-group">{e.group}</span>
+            <span class="glossary-card-term">{e.term}</span>
+            <span class="glossary-card-short">{e.short}</span>
+            <span class="glossary-card-foot">
+              <span>
+                {e.toolCount} {e.toolCount === 1 ? "tool" : "tools"}
+                {e.partialCount > 0 && <span class="glossary-card-partial">{e.partialCount} partial</span>}
+              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+      <p class="no-results" id="glossaryNoResults" hidden>No terms match that search.</p>
+    </div>
+  </section>
+
+  <script>
+    const search = document.getElementById("glossarySearch");
+    const cards = Array.from(document.querySelectorAll(".glossary-card"));
+    const chips = Array.from(document.querySelectorAll(".group-chip"));
+    const visibleEl = document.getElementById("glossaryVisible");
+    const noResults = document.getElementById("glossaryNoResults");
+    let activeGroup = "all";
+
+    function apply() {
+      const q = (search?.value || "").trim().toLowerCase();
+      let visible = 0;
+      for (const card of cards) {
+        const matchesGroup = activeGroup === "all" || card.dataset.group === activeGroup;
+        const matchesQuery = !q || card.dataset.search.includes(q);
+        const show = matchesGroup && matchesQuery;
+        card.hidden = !show;
+        if (show) visible++;
+      }
+      visibleEl.textContent = String(visible);
+      noResults.hidden = visible !== 0;
+    }
+
+    search?.addEventListener("input", apply);
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        activeGroup = chip.dataset.group;
+        chips.forEach((c) => c.classList.toggle("is-active", c === chip));
+        apply();
+      });
+    });
+  </script>
+</Layout>

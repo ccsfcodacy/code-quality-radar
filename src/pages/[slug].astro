@@ -16,6 +16,7 @@ import {
   BEST_FIT_BUYER_LABELS,
   PRICING_MODEL_LABELS,
 } from "../lib/tools.js";
+import { websiteFor } from "../data/tool-websites.js";
 
 export function getStaticPaths() {
   return getAllSlugs().map((slug) => ({ params: { slug } }));
@@ -25,9 +26,16 @@ const { slug } = Astro.params;
 const tool = getToolDetail(slug);
 const allTools = getTools();
 const similar = getSimilarTools(tool, allTools, 4);
+const officialSite = websiteFor(slug);
 
 function ok(v) {
   return v === "yes" || v === "partial";
+}
+// Never let a partial implementation read as full support in generated copy.
+function mark(label, v) {
+  if (v === "yes") return label;
+  if (v === "partial") return `${label} (partial)`;
+  return null;
 }
 function joinList(arr, max = 8) {
   if (!arr || !arr.length) return "";
@@ -37,7 +45,9 @@ function joinList(arr, max = 8) {
 
 const langCount = (typeof tool.languages?.count_claimed === "number" ? tool.languages.count_claimed : 0) || tool.languages?.list?.length || 0;
 const buyerLabels = (tool.fit_signals?.best_fit_buyer || []).map((b) => BEST_FIT_BUYER_LABELS[b] || b);
-const gitLabels = GIT_PROVIDER_FACETS.filter((f) => ok(tool.integrations?.git_providers?.[f.key])).map((f) => f.label);
+const gitLabels = GIT_PROVIDER_FACETS.map((f) =>
+  mark(f.label, tool.integrations?.git_providers?.[f.key])
+).filter(Boolean);
 
 const faqs = [
   {
@@ -92,20 +102,17 @@ const jsonLdFaq = {
   })),
 };
 ---
-<Layout title={`${tool.name} — Review Radar`} description={tool.one_liner}>
+<Layout
+  title={`${tool.name} — Review Radar`}
+  description={tool.one_liner}
+  breadcrumbs={[{ name: tool.name, url: `/${tool.slug}` }]}
+>
   <SimpleHeader slot="header" />
 
   <script type="application/ld+json" set:html={JSON.stringify(jsonLdApp)} />
   <script type="application/ld+json" set:html={JSON.stringify(jsonLdFaq)} />
 
   <div class="container">
-    <div style="padding-top: var(--space-lg);">
-      <a href="/" class="back-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-        All tools
-      </a>
-    </div>
-
     <section class="tool-hero">
       <div class="tool-hero-main">
         <span class="tool-hero-avatar">{tool.name.charAt(0).toUpperCase()}</span>
@@ -126,9 +133,9 @@ const jsonLdFaq = {
         <p class="label quick-fact-label">Deployment</p>
         <p class="quick-fact-value">
           {[
-            ok(tool.deployment?.saas_cloud?.v) && "Cloud",
-            ok(tool.deployment?.self_hosted?.v) && "Self-Hosted",
-            ok(tool.deployment?.air_gapped?.v) && "Air-Gapped",
+            mark("Cloud", tool.deployment?.saas_cloud?.v),
+            mark("Self-Hosted", tool.deployment?.self_hosted?.v),
+            mark("Air-Gapped", tool.deployment?.air_gapped?.v),
           ].filter(Boolean).join(" · ") || "Not documented"}
         </p>
       </div>
@@ -323,5 +330,20 @@ const jsonLdFaq = {
         </div>
       ))}
     </section>
+
+    {officialSite && (
+      <section class="official-link-row">
+        <a class="btn btn-primary btn-official" href={officialSite} target="_blank" rel="nofollow sponsored noopener noreferrer">
+          Visit the official {tool.name} website
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+        </a>
+        <p class="caption" style="margin-top: var(--space-sm);">
+          Opens {new URL(officialSite).hostname} in a new tab.
+          {slug === "codacy"
+            ? " Review Radar is affiliated with Codacy."
+            : ` Review Radar is not affiliated with ${tool.vendor}.`}
+        </p>
+      </section>
+    )}
   </div>
 </Layout>

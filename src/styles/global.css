@@ -705,3 +705,228 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
   .tool-hero { flex-direction: column; }
   .tool-hero-side { align-items: flex-start; text-align: left; }
 }
+
+/* Glossary index */
+.glossary-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+.group-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, background-color .15s ease;
+}
+.group-chip:hover { color: var(--text-primary); border-color: var(--border-hover); }
+.group-chip.is-active {
+  color: var(--accent-text);
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+.group-chip-count { color: var(--text-tertiary); font-size: 11px; }
+.group-chip.is-active .group-chip-count { color: var(--accent-text); }
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+.glossary-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  background: var(--surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  transition: border-color .15s ease;
+}
+.glossary-card:hover { border-color: var(--border-hover); }
+.glossary-card[hidden] { display: none; }
+.glossary-card-group { color: var(--accent-text); }
+.glossary-card-term { font-size: 16px; font-weight: 500; color: var(--text-primary); }
+.glossary-card-short {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.glossary-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--divider);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.glossary-card-foot svg { width: 14px; height: 14px; }
+.glossary-card:hover .glossary-card-foot svg { color: var(--accent-text); }
+
+/* Glossary article */
+.article-container { max-width: 760px; }
+.article-head { padding: var(--space-lg) 0 var(--space-xl); }
+.article-lede {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-top: var(--space-md);
+}
+.article-section { padding: var(--space-xl) 0; border-top: 1px solid var(--divider); }
+.article-body {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+.article-body:last-child { margin-bottom: 0; }
+
+.ranked-list {
+  list-style: none;
+  margin: var(--space-lg) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.ranked-item { display: flex; gap: var(--space-md); align-items: flex-start; }
+.ranked-index {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+.ranked-body { min-width: 0; }
+.ranked-head { display: flex; align-items: center; gap: var(--space-xs); flex-wrap: wrap; }
+.ranked-name { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+.ranked-name:hover { color: var(--accent-text); }
+.ranked-note { font-size: 13px; line-height: 1.55; color: var(--text-secondary); margin-top: var(--space-2xs); }
+.chip-link { transition: border-color .15s ease, color .15s ease; }
+.chip-link:hover { color: var(--accent-text); border-color: var(--accent); }
+
+/* Author byline */
+.author-card {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+}
+.author-avatar {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 500;
+}
+.author-kicker { color: var(--text-tertiary); margin: 0 0 var(--space-2xs); }
+.author-name { font-size: 15px; font-weight: 500; color: var(--text-primary); margin: 0; }
+.author-bio { font-size: 13px; color: var(--text-secondary); margin: var(--space-2xs) 0 0; }
+.author-links { display: flex; gap: var(--space-md); margin-top: var(--space-sm); }
+.author-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.author-links a:hover { color: var(--accent-text); }
+
+/* Official site button (tool page) */
+.official-link-row { padding: var(--space-2xl) 0; border-top: 1px solid var(--divider); }
+.btn-official { display: inline-flex; align-items: center; gap: var(--space-xs); }
+.btn-official svg { width: 15px; height: 15px; }
+
+/* Glossary article: headings need room before the block that follows them.
+   .faq-item zeroes its own top padding for the tool page, where a section head
+   already provides the gap — the article lays sections out differently. */
+.article-section > h2 { margin-bottom: var(--space-md); }
+.article-section .faq-item:first-of-type { padding-top: 0; margin-top: var(--space-lg); }
+.parity-caveat {
+  margin-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-left: 2px solid var(--warning);
+  background: var(--overlay);
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
+  line-height: 1.55;
+}
+
+/* .results-count sits inside .results-bar on the directory, which supplies the
+   gap. Standalone (glossary index) it needs its own. */
+.results-count.is-standalone { margin-bottom: var(--space-lg); }
+.glossary-card-partial {
+  color: var(--warning);
+  margin-left: var(--space-xs);
+  padding-left: var(--space-xs);
+  border-left: 1px solid var(--border-hover);
+}
+
+/* The browser default selection colour sits too close to the muted body text
+   to stay legible on this dark palette. */
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+::-moz-selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* Breadcrumbs */
+.breadcrumbs { padding: var(--space-lg) 0 var(--space-md); }
+.breadcrumbs ol {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.breadcrumbs li { display: flex; align-items: center; gap: var(--space-2xs); }
+.breadcrumbs a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: color .15s ease;
+}
+.breadcrumbs a:hover { color: var(--text-primary); }
+.breadcrumb-home {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  /* The logo mark's circle sits further inside its viewBox than the house path
+     does inside its own, so equal boxes still read as misaligned. Nudge the ink
+     to line up with the wordmark above. */
+  margin-left: 4px;
+}
+.breadcrumb-home svg { width: 15px; height: 15px; }
+.breadcrumb-home:hover { color: var(--accent-text); }
+.breadcrumb-sep { display: inline-flex; color: var(--text-disabled); }
+.breadcrumb-sep svg { width: 13px; height: 13px; }
+.breadcrumb-current { font-size: 13px; color: var(--text-primary); font-weight: 500; }
