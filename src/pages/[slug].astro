@@ -17,6 +17,7 @@ import {
   PRICING_MODEL_LABELS,
 } from "../lib/tools.js";
 import { websiteFor } from "../data/tool-websites.js";
+import { logoPathFor } from "../lib/logos.js";
 
 export function getStaticPaths() {
   return getAllSlugs().map((slug) => ({ params: { slug } }));
@@ -115,7 +116,9 @@ const jsonLdFaq = {
   <div class="container">
     <section class="tool-hero">
       <div class="tool-hero-main">
-        <span class="tool-hero-avatar">{tool.name.charAt(0).toUpperCase()}</span>
+        <span class="tool-hero-avatar">
+          {logoPathFor(tool.slug) ? <img src={logoPathFor(tool.slug)} alt="" loading="lazy" /> : tool.name.charAt(0).toUpperCase()}
+        </span>
         <div>
           <p class="label section-label" style="margin-bottom: var(--space-2xs);">{tool.categoryLabel}</p>
           <h1 class="h1">{tool.name}</h1>

@@ -252,9 +252,26 @@ p, .body  { font-size: 16px; font-weight: 400; line-height: 1.55; margin: 0; }
 
 /* Footer */
 .site-footer {
+  position: relative;
+  overflow: hidden;
   border-top: 1px solid var(--divider);
-  margin-top: var(--space-5xl);
+  margin-top: var(--space-2xl);
   padding: var(--space-3xl) 0 var(--space-2xl);
+}
+.footer-motif {
+  position: absolute;
+  top: 50%;
+  right: -50px;
+  transform: translateY(-50%);
+  width: 240px;
+  height: 240px;
+  z-index: 0;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.footer-top {
+  position: relative;
+  z-index: 1;
 }
 .footer-top {
   display: flex;
@@ -289,6 +306,10 @@ p, .body  { font-size: 16px; font-weight: 400; line-height: 1.55; margin: 0; }
 .footer-github:hover { color: var(--text-primary); }
 @media (max-width: 640px) {
   .footer-nav-col { align-items: flex-start; }
+  /* The footer nav wraps into a narrow single column here, right where the
+     motif bleeds in from the corner — it reads as clutter over the links
+     rather than an accent, so it's cleaner to drop it. */
+  .footer-motif { display: none; }
 }
 
 /* Layout helpers */
@@ -521,6 +542,11 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
   color: var(--accent-text);
   display: flex; align-items: center; justify-content: center;
   font-weight: 500; font-size: 13px;
+  overflow: hidden;
+}
+.tool-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
 }
 .tool-name { font-size: 16px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tool-desc {
@@ -578,6 +604,11 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
   color: var(--accent-text);
   display: flex; align-items: center; justify-content: center;
   font-weight: 500; font-size: 22px;
+  overflow: hidden;
+}
+.tool-hero-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
 }
 .tool-hero-meta { color: var(--text-tertiary); display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
 .tool-hero-side { text-align: right; display: flex; flex-direction: column; gap: var(--space-xs); align-items: flex-end; }

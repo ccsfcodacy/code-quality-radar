@@ -11,6 +11,7 @@ import {
   AI_CAPABILITY_FACETS,
   COMPLIANCE_BOOL_FACETS,
 } from "../lib/tools.js";
+import { logoPathFor } from "../lib/logos.js";
 
 const tools = getTools().sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated) || a.name.localeCompare(b.name));
 const facets = getFacetOptions(tools);
@@ -150,7 +151,9 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
                   <div class="tool-card-head">
                     <p class="tool-category-label">{t.categoryLabel}</p>
                     <div class="tool-name-row">
-                      <span class="tool-avatar">{t.initial}</span>
+                      <span class="tool-avatar">
+                        {logoPathFor(t.slug) ? <img src={logoPathFor(t.slug)} alt="" loading="lazy" /> : t.initial}
+                      </span>
                       <span class="tool-name">{t.name}</span>
                     </div>
                   </div>
