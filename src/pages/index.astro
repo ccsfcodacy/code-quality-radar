@@ -271,10 +271,27 @@ const OR_WITHIN_GROUP = ["category", "pricetransparency"];
         const group = cb.dataset.filterGroup;
         const value = cb.dataset.value;
         let count = 0;
-        for (const card of cards) {
-          if (!cardMatchesSelection(card, selected, query, group)) continue;
-          if (cardMatchesGroup(card, group, value)) count++;
+
+        if (orWithinGroupSet.has(group)) {
+          // Values in this group are alternatives, not additional
+          // constraints, so show how many match this one alone — ignoring
+          // whatever else is checked in the same group.
+          for (const card of cards) {
+            if (!cardMatchesSelection(card, selected, query, group)) continue;
+            if (cardMatchesGroup(card, group, value)) count++;
+          }
+        } else {
+          // This value narrows further alongside whatever else is already
+          // checked in the same group, so fold it into the existing
+          // selection rather than ignoring the group.
+          const candidate = { ...selected };
+          candidate[group] = new Set(selected[group]);
+          candidate[group].add(value);
+          for (const card of cards) {
+            if (cardMatchesSelection(card, candidate, query, null)) count++;
+          }
         }
+
         const countEl = cb.closest(".filter-option")?.querySelector(".filter-count");
         if (countEl) countEl.textContent = String(count);
       }
