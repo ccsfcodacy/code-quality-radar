@@ -17,11 +17,11 @@ const ranked = rankToolsForArticle(article, allTools);
 const fullCount = ranked.filter((t) => !t.partial).length;
 const partialCount = ranked.length - fullCount;
 
-const headline = `Top ${ranked.length} Code Review Tools for ${article.provider}`;
+const headline = `Top ${ranked.length} Code Review Tools for ${article.provider} in 2026`;
 const description = `${ranked.length} of ${allTools.length} tools tracked in this directory integrate with ${article.provider}. ${article.short}`;
 
 const PARITY_CAVEAT =
-  "Support is not the same as parity — some integrations are narrower in scope or gated to a higher plan tier. Tools with full support are listed before those with partial support.";
+  "Support is not the same as parity, since some integrations are narrower in scope or gated to a higher plan tier. Tools with full support are listed before those with partial support.";
 
 const other = EXPLORE_ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 6);
 const anOrA = /^[aeiou]/i.test(article.provider) ? "an" : "a";
@@ -35,7 +35,7 @@ const faqs = [
     q: `How many tools integrate with ${article.provider}?`,
     a:
       `${ranked.length} of ${allTools.length} tools support ${article.provider}` +
-      (partialCount ? ` — ${fullCount} fully and ${partialCount} partially.` : ".") +
+      (partialCount ? `, ${fullCount} fully and ${partialCount} partially.` : ".") +
       ` ${PARITY_CAVEAT}`,
   },
   {
@@ -100,11 +100,11 @@ const jsonLdFaq = {
 
       <section class="article-section">
         <h2 class="h3">
-          Top {ranked.length} {article.provider} {ranked.length === 1 ? "tool" : "tools"}
+          Top {ranked.length} code review {ranked.length === 1 ? "tool" : "tools"} for {article.provider}
         </h2>
         <p class="text-secondary body-sm" style="margin-top: var(--space-xs);">
           Every tool in the directory documented as integrating with {article.provider}
-          {partialCount > 0 && <> — {fullCount} fully, {partialCount} partially</>}.
+          {partialCount > 0 && <>, {fullCount} fully, {partialCount} partially</>}.
         </p>
         {partialCount > 0 && <p class="caption parity-caveat">{PARITY_CAVEAT}</p>}
         <ol class="ranked-list">

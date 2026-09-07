@@ -20,7 +20,7 @@ function findLatestVerifiedOn(node) {
 }
 
 export const CATEGORY_LABELS = {
-  "appsec-platform": "AppSec Platform",
+  "appsec-platform": "Code Security Platform",
   "agent-coding-tool": "Agent Coding Tool",
   "quality-platform": "Quality Platform",
   "pr-review": "PR Review",

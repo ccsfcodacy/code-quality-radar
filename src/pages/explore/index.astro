@@ -17,7 +17,7 @@ const jsonLd = {
   description: "Comparison articles ranking code quality, security and review tools by platform and use case.",
   hasPart: entries.map((e) => ({
     "@type": "Article",
-    headline: `Top ${e.toolCount} Code Review Tools for ${e.provider}`,
+    headline: `Top ${e.toolCount} Code Review Tools for ${e.provider} in 2026`,
     url: new URL(`/explore/${e.slug}`, Astro.site).href,
   })),
 };
@@ -50,7 +50,7 @@ const jsonLd = {
         {entries.map((e) => (
           <a href={`/explore/${e.slug}`} class="glossary-card">
             <span class="label glossary-card-group">{e.group}</span>
-            <span class="glossary-card-term">Top {e.provider} Tools</span>
+            <span class="glossary-card-term">Top {e.toolCount} Code Review Tools for {e.provider} in 2026</span>
             <span class="glossary-card-short">{e.short}</span>
             <span class="glossary-card-foot">
               <span>{e.toolCount} {e.toolCount === 1 ? "tool" : "tools"}</span>

@@ -21,7 +21,7 @@ export async function GET({ site }) {
   lines.push("# Review Radar");
   lines.push("");
   lines.push(
-    "> An independent directory of code quality, application security and code review tools. " +
+    "> An independent directory of code quality, code security and code review tools. " +
       `${tools.length} tools are tracked against the same set of capabilities, so they can be compared ` +
       "on what they actually support rather than on how each vendor describes itself."
   );
@@ -30,7 +30,7 @@ export async function GET({ site }) {
     "Every capability recorded here is taken from the vendor's own public documentation. " +
       "A capability is marked as supported only where it is documented; where documentation is " +
       "silent, it is recorded as such rather than assumed either way. Each tool page shows the " +
-      "date its entry was last verified, and which plan tier a given capability requires — " +
+      "date its entry was last verified, and which plan tier a given capability requires, since " +
       '"the tool can do it" and "the tool can do it on the plan you are evaluating" are ' +
       "tracked as different facts."
   );

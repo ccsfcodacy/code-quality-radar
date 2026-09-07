@@ -54,7 +54,7 @@ const faqs = [
   {
     q: `When should you choose ${tool.name}?`,
     a: `${tool.name} best fits ${joinList(buyerLabels, 5) || "teams evaluating this category"}${
-      tool.fit_signals?.best_fit_team_size ? ` — ${tool.fit_signals.best_fit_team_size}.` : "."
+      tool.fit_signals?.best_fit_team_size ? `, ${tool.fit_signals.best_fit_team_size}.` : "."
     }${tool.fit_signals?.notable_strengths?.[0] ? ` ${tool.fit_signals.notable_strengths[0]}` : ""}`,
   },
   {

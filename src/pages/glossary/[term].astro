@@ -53,7 +53,7 @@ const headline = `What is ${entry.term}?`;
 const partialCount = ranked.filter((t) => t.partial).length;
 const fullCount = ranked.length - partialCount;
 const parityCaveat =
-  "Support is not the same as parity — some implementations are narrower in scope, gated to a higher plan tier, or maintained only for existing customers. The note under each tool is what its own documentation describes.";
+  "Support is not the same as parity, since some implementations are narrower in scope, gated to a higher plan tier, or maintained only for existing customers. The note under each tool is what its own documentation describes.";
 
 const faqs = [
   { q: headline, a: entry.short },
@@ -62,7 +62,7 @@ const faqs = [
     a:
       `${ranked.length} of the ${allTools.length} tools tracked in this directory support ${entry.term}` +
       (partialCount
-        ? ` — ${fullCount} fully and ${partialCount} partially`
+        ? `, ${fullCount} fully and ${partialCount} partially`
         : "") +
       (ranked.length ? `, including ${ranked.slice(0, 5).map((t) => t.name).join(", ")}.` : ".") +
       ` ${parityCaveat}`,
@@ -131,7 +131,7 @@ const jsonLdFaq = {
         <h2 class="h3">Top {ranked.length} {entry.term} {ranked.length === 1 ? "tool" : "tools"}</h2>
         <p class="text-secondary body-sm" style="margin-top: var(--space-xs);">
           Every tool in the directory documented as supporting {entry.term}
-          {partialCount > 0 && <> — {fullCount} fully, {partialCount} partially</>}, with what its
+          {partialCount > 0 && <>, {fullCount} fully, {partialCount} partially</>}, with what its
           own documentation says.
         </p>
         <p class="caption parity-caveat">{parityCaveat}</p>
