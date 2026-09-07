@@ -502,16 +502,14 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
 }
 .active-filter-chip button:hover { background: var(--accent-muted); color: var(--text-primary); }
 
+.results-bar-wrap { margin-bottom: var(--space-lg); }
 .results-bar {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   justify-content: space-between;
   gap: var(--space-md);
-  row-gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
 }
-.results-summary { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); }
+.active-filters:not([hidden]) { margin-top: var(--space-sm); }
 .results-count { color: var(--text-secondary); font-size: 14px; margin-bottom: 0; }
 .results-count b { color: var(--text-primary); font-weight: 500; }
 .sort-control {

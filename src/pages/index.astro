@@ -33,6 +33,15 @@ function labelsOf(defs, obj) {
 // Groups whose values are free text (may contain spaces) are matched via
 // pipe-delimited membership; everything else is a space-separated token list.
 const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers", "chat"];
+
+// Every group holds independent capabilities a tool can have several of at
+// once (e.g. a tool can be priced both per-seat and quote-based), so checking
+// multiple values in the same group narrows the results (AND) rather than
+// broadening them (OR). The two exceptions are facets that store a single
+// mutually-exclusive value per tool — a tool has exactly one category and one
+// price-transparency rating, so those stay OR-within-group, or picking two
+// values would always produce zero matches.
+const OR_WITHIN_GROUP = ["category", "pricetransparency"];
 ---
 <Layout
   title="Review Radar — Code Quality, Code Security & Code Review Tools"
@@ -83,21 +92,21 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
         </aside>
 
         <div>
-          <div class="results-bar">
-            <div class="results-summary">
+          <div class="results-bar-wrap">
+            <div class="results-bar">
               <p class="results-count" id="resultsCount">
                 Showing <b id="visibleCount">{totalCount}</b> of {totalCount} tools
               </p>
-              <div class="active-filters" id="activeFilters" hidden></div>
+              <label class="sort-control">
+                Sort by
+                <select id="sortSelect">
+                  <option value="updated" selected>Last updated</option>
+                  <option value="name-asc">Name (A–Z)</option>
+                  <option value="name-desc">Name (Z–A)</option>
+                </select>
+              </label>
             </div>
-            <label class="sort-control">
-              Sort by
-              <select id="sortSelect">
-                <option value="updated" selected>Last updated</option>
-                <option value="name-asc">Name (A–Z)</option>
-                <option value="name-desc">Name (Z–A)</option>
-              </select>
-            </label>
+            <div class="active-filters" id="activeFilters" hidden></div>
           </div>
           <div class="tool-grid" id="toolGrid">
             {tools.map((t) => {
@@ -178,7 +187,7 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
     </div>
   </section>
 
-  <script define:vars={{ pipeGroups: PIPE_GROUPS }}>
+  <script define:vars={{ pipeGroups: PIPE_GROUPS, orWithinGroup: OR_WITHIN_GROUP }}>
     const searchInput = document.getElementById("searchInput");
     const clearBtn = document.getElementById("clearFilters");
     const sortSelect = document.getElementById("sortSelect");
@@ -188,6 +197,7 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
     const noResultsEl = document.getElementById("noResults");
     const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-filter-group]'));
     const pipeGroupSet = new Set(pipeGroups);
+    const orWithinGroupSet = new Set(orWithinGroup);
     const activeFiltersEl = document.getElementById("activeFilters");
 
     function renderActiveFilters() {
@@ -247,7 +257,11 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
       if (query && !card.dataset.search.includes(query)) return false;
       for (const [group, values] of Object.entries(selected)) {
         if (group === skipGroup) continue;
-        if (!Array.from(values).some((v) => cardMatchesGroup(card, group, v))) return false;
+        const values_ = Array.from(values);
+        const matches = orWithinGroupSet.has(group)
+          ? values_.some((v) => cardMatchesGroup(card, group, v))
+          : values_.every((v) => cardMatchesGroup(card, group, v));
+        if (!matches) return false;
       }
       return true;
     }
