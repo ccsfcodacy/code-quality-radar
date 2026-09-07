@@ -3,6 +3,7 @@
 // drift out of sync with the site.
 import { getTools, CATEGORY_LABELS } from "../lib/tools.js";
 import { GLOSSARY, GLOSSARY_GROUPS, splitToolsForTerm, PARITY_CAVEAT } from "../data/glossary.js";
+import { EXPLORE_ARTICLES, rankToolsForArticle } from "../data/explore.js";
 import rawData from "../data/tools.public.json";
 
 export async function GET({ site }) {
@@ -46,6 +47,7 @@ export async function GET({ site }) {
   lines.push("");
   lines.push(`- [All tools](${url("/")}): the full directory, filterable by category, deployment model, git platform, analysis type, compliance, integrations, language and pricing.`);
   lines.push(`- [Glossary](${url("/glossary")}): ${GLOSSARY.length} definitions of the terms used across the directory, each listing the tools that support it.`);
+  lines.push(`- [Explore](${url("/explore")}): comparison articles ranking tools by git hosting platform.`);
   lines.push(`- [About](${url("/about")}): what the directory covers and how entries are kept current.`);
   lines.push("");
 
@@ -86,6 +88,19 @@ export async function GET({ site }) {
     }
     lines.push("");
   }
+
+  lines.push("## Explore");
+  lines.push("");
+  for (const a of EXPLORE_ARTICLES) {
+    const ranked = rankToolsForArticle(a, tools);
+    const full = ranked.filter((t) => !t.partial).length;
+    const partial = ranked.length - full;
+    const breakdown = partial
+      ? `${ranked.length} tools integrate with it (${full} fully, ${partial} partially).`
+      : `${ranked.length} tools integrate with it.`;
+    lines.push(`- [Top ${a.provider} Tools](${url(`/explore/${a.slug}`)}): ${a.short} ${breakdown}`);
+  }
+  lines.push("");
 
   return new Response(`${lines.join("\n").trimEnd()}\n`, {
     headers: { "Content-Type": "text/plain; charset=utf-8" },

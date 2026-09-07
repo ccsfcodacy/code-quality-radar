@@ -415,15 +415,6 @@ p, .body  { font-size: 16px; font-weight: 400; line-height: 1.55; margin: 0; }
   flex-shrink: 0;
 }
 details[open] > .filter-group-title::before { transform: rotate(45deg); }
-.filter-group-total {
-  color: var(--text-tertiary);
-  font-size: 10px;
-  font-weight: 500;
-  margin-left: auto;
-  background: var(--overlay);
-  border-radius: var(--radius-full);
-  padding: 2px 7px;
-}
 .filter-group-body { margin-top: var(--space-sm); padding-left: var(--space-sm); }
 .filter-options { display: flex; flex-direction: column; gap: var(--space-2xs); }
 .filter-options.scrollable { max-height: 220px; overflow-y: auto; padding-right: var(--space-2xs); }
@@ -910,13 +901,6 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
   transition: color .15s ease;
 }
 .breadcrumbs a:hover { color: var(--text-primary); }
-.breadcrumb-home {
-  display: inline-flex;
-  align-items: center;
-  color: var(--text-tertiary);
-}
-.breadcrumb-home svg { width: 15px; height: 15px; }
-.breadcrumb-home:hover { color: var(--accent-text); }
 .breadcrumb-sep { display: inline-flex; color: var(--text-disabled); }
 .breadcrumb-sep svg { width: 13px; height: 13px; }
 .breadcrumb-current { font-size: 13px; color: var(--text-primary); font-weight: 500; }

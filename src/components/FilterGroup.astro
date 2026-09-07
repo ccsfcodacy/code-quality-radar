@@ -17,7 +17,6 @@ const { title, groupKey, options, searchable = false, open = true } = Astro.prop
 <details class="filter-group" open={open}>
   <summary class="filter-group-title">
     <span>{title}</span>
-    <span class="filter-group-total">{options.length}</span>
   </summary>
   <div class="filter-group-body">
     {searchable && (

@@ -1,0 +1,64 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SimpleHeader from "../../components/SimpleHeader.astro";
+import { EXPLORE_ARTICLES, rankToolsForArticle } from "../../data/explore.js";
+import { getTools } from "../../lib/tools.js";
+
+const tools = getTools();
+const entries = EXPLORE_ARTICLES.map((a) => ({
+  ...a,
+  toolCount: rankToolsForArticle(a, tools).length,
+})).sort((a, b) => a.provider.localeCompare(b.provider));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Explore — Review Radar",
+  description: "Comparison articles ranking code quality, security and review tools by platform and use case.",
+  hasPart: entries.map((e) => ({
+    "@type": "Article",
+    headline: `Top ${e.toolCount} Code Review Tools for ${e.provider}`,
+    url: new URL(`/explore/${e.slug}`, Astro.site).href,
+  })),
+};
+---
+<Layout
+  title="Explore — Review Radar"
+  description="Comparison articles ranking code quality, security and code review tools by git hosting platform, so you can find what integrates with the platform you already use."
+  breadcrumbs={[{ name: "Explore", url: "/explore" }]}
+>
+  <SimpleHeader slot="header" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="hero-search-wrap">
+    <div class="container">
+      <p class="label section-label">Explore</p>
+      <h1 class="h2" style="margin-top: var(--space-2xs);">Tools ranked by platform</h1>
+      <p class="text-secondary" style="margin-top: var(--space-sm); max-width: 620px;">
+        Which code quality, security and review tools integrate with the git hosting platform you
+        already use, ranked from the same dataset as the rest of the directory.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <p class="results-count is-standalone">
+        Showing <b>{entries.length}</b> {entries.length === 1 ? "article" : "articles"}
+      </p>
+      <div class="glossary-grid">
+        {entries.map((e) => (
+          <a href={`/explore/${e.slug}`} class="glossary-card">
+            <span class="label glossary-card-group">{e.group}</span>
+            <span class="glossary-card-term">Top {e.provider} Tools</span>
+            <span class="glossary-card-short">{e.short}</span>
+            <span class="glossary-card-foot">
+              <span>{e.toolCount} {e.toolCount === 1 ? "tool" : "tools"}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

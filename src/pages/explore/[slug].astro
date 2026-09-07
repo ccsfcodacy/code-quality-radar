@@ -1,0 +1,162 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SimpleHeader from "../../components/SimpleHeader.astro";
+import AuthorCard from "../../components/AuthorCard.astro";
+import { EXPLORE_ARTICLES, getExploreArticle, rankToolsForArticle } from "../../data/explore.js";
+import { getTools } from "../../lib/tools.js";
+import { AUTHOR } from "../../data/author.js";
+
+export function getStaticPaths() {
+  return EXPLORE_ARTICLES.map((a) => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+const article = getExploreArticle(slug);
+const allTools = getTools();
+const ranked = rankToolsForArticle(article, allTools);
+const fullCount = ranked.filter((t) => !t.partial).length;
+const partialCount = ranked.length - fullCount;
+
+const headline = `Top ${ranked.length} Code Review Tools for ${article.provider}`;
+const description = `${ranked.length} of ${allTools.length} tools tracked in this directory integrate with ${article.provider}. ${article.short}`;
+
+const PARITY_CAVEAT =
+  "Support is not the same as parity — some integrations are narrower in scope or gated to a higher plan tier. Tools with full support are listed before those with partial support.";
+
+const other = EXPLORE_ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 6);
+const anOrA = /^[aeiou]/i.test(article.provider) ? "an" : "a";
+
+const faqs = [
+  {
+    q: `What are the best code review tools for ${article.provider}?`,
+    a: `${ranked.length ? ranked.slice(0, 5).map((t) => t.name).join(", ") : "None currently tracked"} are the ${article.provider} integrations documented in this directory, out of ${allTools.length} tools tracked in total.`,
+  },
+  {
+    q: `How many tools integrate with ${article.provider}?`,
+    a:
+      `${ranked.length} of ${allTools.length} tools support ${article.provider}` +
+      (partialCount ? ` — ${fullCount} fully and ${partialCount} partially.` : ".") +
+      ` ${PARITY_CAVEAT}`,
+  },
+  {
+    q: `What should you look for in ${anOrA} ${article.provider} code review tool?`,
+    a: article.lookFor.join(". ") + ".",
+  },
+];
+
+const jsonLdArticle = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline,
+  description,
+  author: { "@type": "Person", name: AUTHOR.name, url: AUTHOR.linkedin },
+  about: { "@type": "Thing", name: article.provider },
+};
+const jsonLdItemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: headline,
+  itemListElement: ranked.map((t, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: t.name,
+    url: new URL(`/${t.slug}`, Astro.site).href,
+  })),
+};
+const jsonLdFaq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+<Layout
+  title={`${headline} — Review Radar`}
+  description={description}
+  breadcrumbs={[
+    { name: "Explore", url: "/explore" },
+    { name: `Top ${article.provider} Tools`, url: `/explore/${article.slug}` },
+  ]}
+>
+  <SimpleHeader slot="header" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdArticle)} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdItemList)} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLdFaq)} />
+
+  <div class="container article-container">
+    <article>
+      <header class="article-head">
+        <p class="label section-label">{article.group}</p>
+        <h1 class="h1">{headline}</h1>
+        <p class="article-lede">{article.short}</p>
+      </header>
+
+      <section class="article-section">
+        {article.intro.map((p) => <p class="article-body">{p}</p>)}
+      </section>
+
+      <section class="article-section">
+        <h2 class="h3">
+          Top {ranked.length} {article.provider} {ranked.length === 1 ? "tool" : "tools"}
+        </h2>
+        <p class="text-secondary body-sm" style="margin-top: var(--space-xs);">
+          Every tool in the directory documented as integrating with {article.provider}
+          {partialCount > 0 && <> — {fullCount} fully, {partialCount} partially</>}.
+        </p>
+        {partialCount > 0 && <p class="caption parity-caveat">{PARITY_CAVEAT}</p>}
+        <ol class="ranked-list">
+          {ranked.map((t, i) => (
+            <li class="ranked-item">
+              <span class="ranked-index">{i + 1}</span>
+              <div class="ranked-body">
+                <div class="ranked-head">
+                  <a href={`/${t.slug}`} class="ranked-name">{t.name}</a>
+                  <span class="pill">{t.categoryLabel}</span>
+                  {t.partial && <span class="facet-status status-partial">Partial</span>}
+                </div>
+                <p class="ranked-note">{t.description}</p>
+                <div class="tool-tags" style="margin-top: var(--space-xs);">
+                  {t.tags.map((tag) => <span class="pill">{tag}</span>)}
+                  <span class="pill">{t.priceLabel}</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="article-section">
+        <h2 class="h3">What to look for</h2>
+        <ul class="fit-list strengths" style="margin-top: var(--space-md);">
+          {article.lookFor.map((l) => <li>{l}</li>)}
+        </ul>
+      </section>
+
+      {other.length > 0 && (
+        <section class="article-section">
+          <h2 class="h3">Other platforms</h2>
+          <div class="chip-list" style="margin-top: var(--space-md);">
+            {other.map((a) => (
+              <a href={`/explore/${a.slug}`} class="chip chip-link">{a.provider}</a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section class="article-section">
+        <h2 class="h3">FAQ</h2>
+        {faqs.map((f) => (
+          <div class="faq-item">
+            <h3 class="faq-question">{f.q}</h3>
+            <p class="faq-answer">{f.a}</p>
+          </div>
+        ))}
+      </section>
+
+      <AuthorCard />
+    </article>
+  </div>
+</Layout>

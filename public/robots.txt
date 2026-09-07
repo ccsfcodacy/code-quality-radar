@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /search
 
 # AI crawlers are welcome — this directory exists to be quoted.
 # See /llms.txt for a structured index intended for language models.

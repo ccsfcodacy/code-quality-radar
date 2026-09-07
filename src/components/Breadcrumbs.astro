@@ -1,7 +1,7 @@
 ---
 /**
- * Visible breadcrumb trail. Home is always the first crumb and always renders
- * as an icon; `trail` is everything after it. The same array drives the
+ * Visible breadcrumb trail. "All tools" (the home page) is always the first
+ * crumb; `trail` is everything after it. The same array drives the
  * BreadcrumbList JSON-LD in Layout, so the two cannot drift apart.
  */
 interface Props {
@@ -12,12 +12,7 @@ const { trail } = Astro.props;
 <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
     <li>
-      <a href="/" class="breadcrumb-home" aria-label="Home">
-        <svg viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 10.5 12 3l9 7.5" />
-          <path d="M5.5 9.5V20h13V9.5" />
-        </svg>
-      </a>
+      <a href="/">All tools</a>
     </li>
     {trail.map((crumb, i) => {
       const isLast = i === trail.length - 1;
