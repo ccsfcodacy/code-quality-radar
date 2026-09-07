@@ -35,7 +35,7 @@ function labelsOf(defs, obj) {
 const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers", "chat"];
 ---
 <Layout
-  title="Review Radar — Code Quality, AppSec &amp; PR Review Tools"
+  title="Review Radar — Code Quality, Code Security & Code Review Tools"
   description="A directory of code quality, static analysis, security scanning, and AI-assisted code review tools. Filter by category, language, deployment model, compliance, integrations, and pricing."
 >
   <header class="site-header directory-header" slot="header">
@@ -84,9 +84,12 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
 
         <div>
           <div class="results-bar">
-            <p class="results-count" id="resultsCount">
-              Showing <b id="visibleCount">{totalCount}</b> of {totalCount} tools
-            </p>
+            <div class="results-summary">
+              <p class="results-count" id="resultsCount">
+                Showing <b id="visibleCount">{totalCount}</b> of {totalCount} tools
+              </p>
+              <div class="active-filters" id="activeFilters" hidden></div>
+            </div>
             <label class="sort-control">
               Sort by
               <select id="sortSelect">
@@ -185,6 +188,33 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
     const noResultsEl = document.getElementById("noResults");
     const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-filter-group]'));
     const pipeGroupSet = new Set(pipeGroups);
+    const activeFiltersEl = document.getElementById("activeFilters");
+
+    function renderActiveFilters() {
+      const checked = checkboxes.filter((cb) => cb.checked);
+      activeFiltersEl.innerHTML = "";
+      activeFiltersEl.hidden = checked.length === 0;
+      for (const cb of checked) {
+        const label = cb.closest(".filter-option")?.querySelector("span")?.textContent || cb.dataset.value;
+        const chip = document.createElement("span");
+        chip.className = "active-filter-chip";
+
+        const text = document.createElement("span");
+        text.textContent = label;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.setAttribute("aria-label", `Remove filter: ${label}`);
+        removeBtn.textContent = "×";
+        removeBtn.addEventListener("click", () => {
+          cb.checked = false;
+          applyFilters();
+        });
+
+        chip.append(text, removeBtn);
+        activeFiltersEl.appendChild(chip);
+      }
+    }
 
     function applySort() {
       const mode = sortSelect?.value || "updated";
@@ -250,6 +280,7 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
       visibleCountEl.textContent = String(visible);
       noResultsEl.hidden = visible !== 0;
       updateFacetCounts(selected, query);
+      renderActiveFilters();
     }
 
     searchInput?.addEventListener("input", applyFilters);
