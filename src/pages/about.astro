@@ -4,7 +4,7 @@ import SimpleHeader from "../components/SimpleHeader.astro";
 ---
 <Layout
   title="About — Review Radar"
-  description="Review Radar is a directory of code quality, security, and review tools, tracked against public documentation so engineers can compare capabilities without wading through marketing pages."
+  description="Review Radar records what code quality, security and code review tools support, using the same set of criteria for each tool, so they can be compared directly against vendor documentation."
   breadcrumbs={[{ name: "About", url: "/about" }]}
 >
   <SimpleHeader slot="header" />
@@ -12,11 +12,11 @@ import SimpleHeader from "../components/SimpleHeader.astro";
   <section class="section" style="padding-top: var(--space-4xl); position: relative; overflow: hidden;">
     <div class="container" style="max-width: 760px;">
       <p class="label section-label">About</p>
-      <h1 class="h1">A directory for finding the right code review tool — not the loudest one.</h1>
+      <h1 class="h1">A directory of code quality, security and code review tools.</h1>
       <p class="body-lg text-secondary" style="margin-top: var(--space-lg);">
-        Review Radar tracks code quality, static analysis, security scanning, and AI-assisted
-        review tools side by side, so you can filter by what a tool actually does instead of
-        reading twenty marketing pages to find out.
+        Review Radar records what code quality, static analysis, security scanning and AI-assisted
+        review tools support. Every tool is recorded against the same set of criteria, so they can
+        be compared directly.
       </p>
     </div>
     <svg aria-hidden="true" width="360" height="360" viewBox="0 0 360 360" style="position:absolute; right:-90px; top:-40px; opacity:0.35; pointer-events:none;">
@@ -35,18 +35,21 @@ import SimpleHeader from "../components/SimpleHeader.astro";
   <section class="section">
     <div class="container" style="max-width: 760px;">
       <p class="label section-label">Why this exists</p>
-      <h2 class="h2">The category won't hold still.</h2>
+      <h2 class="h2">Vendor documentation is difficult to compare.</h2>
       <hr class="rule-short" />
       <p class="text-secondary" style="margin-top: var(--space-md);">
-        New static analysis, security scanning, and AI-assisted review tools ship every month.
-        Existing ones change what's free versus what's gated behind an enterprise tier, add a
-        language, drop a deployment option. Almost every vendor page is written to sell, which
-        makes it a bad instrument for comparison — the page that says "supports everything" and
-        the page that lists an actual limitation read identically confident.
+        New static analysis, security scanning and AI-assisted review tools are released
+        regularly. Existing ones change which capabilities are free, which require an enterprise
+        plan, which languages they cover and which deployment models they support.
       </p>
       <p class="text-secondary" style="margin-top: var(--space-md);">
-        Review Radar exists to answer a narrower, more useful question: does this specific tool
-        support what you need, on the plan you'd actually pay for.
+        Each vendor describes its own product in its own terms, and limitations are rarely stated
+        directly. Comparing two tools therefore means reading both sets of documentation in full
+        and working out what has been left out.
+      </p>
+      <p class="text-secondary" style="margin-top: var(--space-md);">
+        Review Radar answers a narrower question: does a specific tool support a specific
+        capability, and on which plan.
       </p>
     </div>
   </section>
@@ -56,12 +59,11 @@ import SimpleHeader from "../components/SimpleHeader.astro";
   <section class="section">
     <div class="container" style="max-width: 760px;">
       <p class="label section-label">What we track</p>
-      <h2 class="h2">Capabilities, not categories.</h2>
+      <h2 class="h2">The same criteria for every tool.</h2>
       <hr class="rule-short" />
       <p class="text-secondary" style="margin-top: var(--space-md);">
-        Every tool in the directory is broken down into the same set of filterable facets, so a
-        SAST scanner and an AI review agent can be compared on equal terms where they actually
-        overlap:
+        Each tool is recorded against the same set of capabilities, so tools built for different
+        purposes can still be compared where they overlap:
       </p>
       <div style="display:flex; flex-wrap:wrap; gap: var(--space-xs); margin-top: var(--space-lg);">
         <span class="pill">Code Quality</span>
@@ -76,10 +78,10 @@ import SimpleHeader from "../components/SimpleHeader.astro";
         <span class="pill">Linting</span>
       </div>
       <p class="text-secondary" style="margin-top: var(--space-lg);">
-        Alongside category, each entry also carries the detail that actually decides a shortlist:
-        supported languages, integrations, deployment model (cloud, self-hosted, air-gapped), and
-        which plan tier a capability requires — because "the tool can do it" and "the tool can do
-        it on the plan you're evaluating" are different facts.
+        Each entry also records supported languages, integrations, deployment model (cloud,
+        self-hosted, air-gapped) and the plan tier each capability requires. Whether a tool
+        supports a capability, and whether it supports it on a given plan, are recorded as
+        separate facts.
       </p>
     </div>
   </section>
@@ -92,16 +94,23 @@ import SimpleHeader from "../components/SimpleHeader.astro";
       <h2 class="h2">Checked against the vendor's own documentation.</h2>
       <hr class="rule-short" />
       <p class="text-secondary" style="margin-top: var(--space-md);">
-        Each entry is reviewed directly against public sources — product docs, pricing pages,
-        changelogs, and release notes — not against marketing copy or secondhand summaries. A
-        capability is only marked as supported when it's documented; if a vendor's docs are
-        silent on something, that's recorded as unknown rather than assumed either way.
+        Each entry is reviewed against public sources: product documentation, pricing pages,
+        changelogs and release notes. A capability is recorded as supported only where it is
+        documented. Where the documentation does not address it, it is recorded as unknown rather
+        than assumed either way.
       </p>
       <p class="text-secondary" style="margin-top: var(--space-md);">
-        Tools move fast, so entries are re-checked on a rolling basis rather than once and
-        forgotten. Every tool page shows when it was last verified, so you can judge for yourself
-        whether it's still fresh enough to act on.
+        Entries are re-checked on a rolling basis. Every tool page shows the date its entry was
+        last verified.
       </p>
+      <div class="callout">
+        <p class="callout-title">This doesn't replace the official documentation.</p>
+        <p>
+          Every entry here is a summary of what a vendor published on a particular date. Plans get
+          restructured, capabilities move between tiers, and prices change without anyone
+          announcing it.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -110,12 +119,12 @@ import SimpleHeader from "../components/SimpleHeader.astro";
   <section class="section">
     <div class="container" style="max-width: 760px;">
       <p class="label section-label">Who it's for</p>
-      <h2 class="h2">Built for the person doing the evaluation.</h2>
+      <h2 class="h2">Engineers and security teams evaluating tools.</h2>
       <hr class="rule-short" />
       <p class="text-secondary" style="margin-top: var(--space-md);">
-        Engineers, security teams, and platform leads narrowing down a tool during a procurement
-        cycle, a migration, or a compliance push. If you already know roughly what you need and
-        want to check who actually offers it, that's what this is for.
+        Engineers, security teams and platform leads shortlisting a tool during procurement, a
+        migration or a compliance review. It assumes you already know roughly which capabilities
+        you need and want to check which tools provide them.
       </p>
       <div style="margin-top: var(--space-xl);">
         <a href="/" class="btn btn-primary">Browse tools</a>

@@ -920,3 +920,24 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
 .breadcrumb-sep { display: inline-flex; color: var(--text-disabled); }
 .breadcrumb-sep svg { width: 13px; height: 13px; }
 .breadcrumb-current { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+
+/* Callout — for a caveat that needs to interrupt the reading flow.
+   Shares the amber accent of .parity-caveat but at body size, since this one
+   is prose the reader is meant to stop and take in. */
+.callout {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  border-left: 2px solid var(--warning);
+  background: var(--overlay);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+}
+.callout-title {
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+}
+.callout p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
