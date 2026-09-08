@@ -1479,7 +1479,6 @@
           "TeamCity",
           "Azure DevOps",
           "Maven",
-          "SonarQube (imports Checkmarx results into SonarQube's dashboard)",
           "Any other CI/CD via the Checkmarx One CLI Tool (cx)"
         ],
         "ides": [
@@ -2533,7 +2532,7 @@
           "Azure Pipelines",
           "Travis CI",
           "Bitbucket Pipelines",
-          "DroneCI",
+          "Drone CI",
           "GoCD",
           "Bamboo",
           "TeamCity",
@@ -7716,7 +7715,7 @@
           "Jenkins",
           "Bitrise",
           "Semaphore",
-          "CodeFresh",
+          "Codefresh",
           "any CI provider meeting CLI system requirements"
         ],
         "ides": [
@@ -9220,10 +9219,6 @@
         "ci_systems": [
           "GitHub Actions",
           "Snyk IaC GitHub Action",
-          "GitLab",
-          "Bitbucket Cloud",
-          "Bitbucket Server",
-          "GitHub Enterprise",
           "any CI/CD via Snyk CLI"
         ],
         "ides": [
@@ -10328,7 +10323,7 @@
           "JetBrains TeamCity",
           "CircleCI",
           "Codeship",
-          "TravisCI",
+          "Travis CI",
           "Apache Ant",
           "Apache Maven",
           "Gradle",

@@ -125,12 +125,6 @@ export const PRICING_MODEL_LABELS = {
   "per-lines-of-code": "Per lines of code",
 };
 
-const PRICE_TRANSPARENCY_LABELS = {
-  published: "Published pricing",
-  partial: "Partially published",
-  "quote-only": "Quote-only (no published price)",
-};
-
 // Free-text integration/compliance fields are written independently per vendor doc,
 // so the same real thing shows up phrased several ways. This is a best-effort merge,
 // not a controlled vocabulary — most entries are left as vendors wrote them.
@@ -148,6 +142,11 @@ const VALUE_SYNONYMS = {
   "jira (cloud and server)": "Jira",
   "github issues": "GitHub Issues",
   phpstorm: "PhpStorm",
+  travisci: "Travis CI",
+  "teamcity ci": "TeamCity",
+  "jetbrains teamcity": "TeamCity",
+  "jenkins/hudson": "Jenkins",
+  "atlassian bamboo": "Bamboo",
 };
 
 function normalizeListValue(raw) {
@@ -269,7 +268,6 @@ export function getTools() {
       chatNotifications: normalizedList(tool.integrations?.chat_notifications),
 
       pricingModels: commercial.pricing_models || [],
-      priceTransparency: commercial.price_transparency || "unknown",
       freeTier: commercial.free_tier?.v === "yes" || commercial.free_tier?.v === "partial",
       freeForOpenSource: isSupported(commercial.free_for_open_source),
       enterpriseQuoteOnly: isSupported(commercial.enterprise_quote_only),
@@ -363,12 +361,6 @@ export function getFacetOptions(tools) {
     { key: "enterpriseQuoteOnly", label: "Enterprise Plan Is Quote-Only", count: tools.filter((t) => t.enterpriseQuoteOnly).length },
   ];
 
-  const priceTransparencyCount = {};
-  for (const t of tools) priceTransparencyCount[t.priceTransparency] = (priceTransparencyCount[t.priceTransparency] || 0) + 1;
-  const priceTransparency = Object.entries(priceTransparencyCount)
-    .map(([value, count]) => ({ key: value, label: PRICE_TRANSPARENCY_LABELS[value] || value, count }))
-    .sort((a, b) => b.count - a.count);
-
   return {
     categories,
     deployment,
@@ -386,7 +378,6 @@ export function getFacetOptions(tools) {
     chatNotifications,
     pricingModels,
     pricingBool,
-    priceTransparency,
   };
 }
 
