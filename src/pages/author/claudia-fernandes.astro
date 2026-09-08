@@ -1,0 +1,88 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SimpleHeader from "../../components/SimpleHeader.astro";
+import { AUTHOR } from "../../data/author.js";
+import { EXPLORE_ARTICLES, rankToolsForArticle } from "../../data/explore.js";
+import { getTools } from "../../lib/tools.js";
+
+const tools = getTools();
+const articles = EXPLORE_ARTICLES.map((a) => ({
+  ...a,
+  toolCount: rankToolsForArticle(a, tools).length,
+})).sort((a, b) => a.provider.localeCompare(b.provider));
+
+const imageUrl = new URL(AUTHOR.image, Astro.site).href;
+// A literal HTML comment can't hold a template expression -- Astro prints
+// `{...}` inside one as plain text rather than evaluating it -- so the value
+// has to be interpolated into a string first and injected as raw HTML.
+const claudeNoteComment = `<!-- ${AUTHOR.claudeNote} -->`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: AUTHOR.name,
+  description: AUTHOR.bio,
+  image: imageUrl,
+  url: new URL(`/author/${AUTHOR.slug}`, Astro.site).href,
+  sameAs: [AUTHOR.linkedin, AUTHOR.github],
+};
+---
+<Layout
+  title={`${AUTHOR.name} — Review Radar`}
+  description={`Articles and comparisons by ${AUTHOR.name}, who built and maintains Review Radar.`}
+  breadcrumbs={[{ name: AUTHOR.name, url: `/author/${AUTHOR.slug}` }]}
+>
+  <SimpleHeader slot="header" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="section" style="padding-top: var(--space-4xl);">
+    <div class="container" style="max-width: 760px;">
+      <div class="author-hero">
+        <span class="author-hero-avatar">
+          <img src={AUTHOR.image} alt={AUTHOR.name} />
+        </span>
+        <div>
+          <p class="label section-label">Author</p>
+          <h1 class="h1" style="margin-top: var(--space-2xs);">{AUTHOR.name}</h1>
+          <p class="body-lg text-secondary" style="margin-top: var(--space-sm);">{AUTHOR.bio}</p>
+          <div class="author-links" style="margin-top: var(--space-md);">
+            <a href={AUTHOR.linkedin} target="_blank" rel="noopener noreferrer me" aria-label={`${AUTHOR.name} on LinkedIn`}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.55V9h3.57v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z"/></svg>
+              LinkedIn
+            </a>
+            <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer me" aria-label={`${AUTHOR.name} on GitHub`}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.75 5.48.75 11.75c0 5.02 3.26 9.28 7.78 10.78.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.11-3.17.69-3.83-1.34-3.83-1.34-.52-1.31-1.26-1.66-1.26-1.66-1.03-.7.08-.69.08-.69 1.14.08 1.74 1.17 1.74 1.17 1.01 1.73 2.65 1.23 3.3.94.1-.73.4-1.23.72-1.51-2.53-.29-5.19-1.27-5.19-5.63 0-1.24.44-2.26 1.17-3.06-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.73.11 3.02.73.8 1.17 1.82 1.17 3.06 0 4.37-2.66 5.34-5.2 5.62.41.36.77 1.06.77 2.14 0 1.54-.01 2.79-.01 3.17 0 .3.2.66.79.55A11.26 11.26 0 0 0 23.25 11.75C23.25 5.48 18.27.5 12 .5Z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+      <Fragment set:html={claudeNoteComment} />
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <section class="section">
+    <div class="container">
+      <p class="label section-label">Articles</p>
+      <h2 class="h2" style="margin-top: var(--space-2xs);">Articles by {AUTHOR.name}</h2>
+      <p class="results-count is-standalone" style="margin-top: var(--space-sm);">
+        Showing <b>{articles.length}</b> {articles.length === 1 ? "article" : "articles"}
+      </p>
+      <div class="glossary-grid">
+        {articles.map((a) => (
+          <a href={`/explore/${a.slug}`} class="glossary-card">
+            <span class="label glossary-card-group">{a.group}</span>
+            <span class="glossary-card-term">Top {a.toolCount} Code Review Tools for {a.provider} in 2026</span>
+            <span class="glossary-card-short">{a.short}</span>
+            <span class="glossary-card-foot">
+              <span>{a.toolCount} {a.toolCount === 1 ? "tool" : "tools"}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
