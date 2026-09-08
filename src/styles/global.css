@@ -927,6 +927,11 @@ details[open] > .filter-group-title::before { transform: rotate(45deg); }
   overflow: hidden;
 }
 .author-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 640px) {
+  /* The game needs a mouse-precision pointer and a wide-enough canvas to
+     read the HUD; on a phone it's just a cramped dead zone, so skip it. */
+  .bug-hunt-embed { display: none; }
+}
 
 /* Official site button (tool page) */
 .official-link-row { padding: var(--space-2xl) 0; border-top: 1px solid var(--divider); }
