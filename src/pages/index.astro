@@ -41,7 +41,7 @@ const PIPE_GROUPS = ["languages", "certifications", "ides", "ci", "issuetrackers
 // mutually-exclusive value per tool — a tool has exactly one category and one
 // price-transparency rating, so those stay OR-within-group, or picking two
 // values would always produce zero matches.
-const OR_WITHIN_GROUP = ["category", "pricetransparency"];
+const OR_WITHIN_GROUP = ["category"];
 ---
 <Layout
   title="Review Radar — Code Quality, Code Security & Code Review Tools"
@@ -72,15 +72,14 @@ const OR_WITHIN_GROUP = ["category", "pricetransparency"];
             <button type="button" id="clearFilters">Clear all</button>
           </div>
 
-          <FilterGroup title="Category" groupKey="category" options={facets.categories} open={true} />
-          <FilterGroup title="Deployment" groupKey="deployment" options={facets.deployment} open={true} />
+          <FilterGroup title="Git Hosting Platform" groupKey="git" options={facets.gitProviders} open={true} />
           <FilterGroup title="Pricing Model" groupKey="pricingmodel" options={facets.pricingModels} open={true} />
           <FilterGroup title="Pricing & Trial" groupKey="pricingbool" options={facets.pricingBool} open={true} />
-          <FilterGroup title="Pricing Transparency" groupKey="pricetransparency" options={facets.priceTransparency} open={false} />
-          <FilterGroup title="Git Hosting Platform" groupKey="git" options={facets.gitProviders} open={false} />
+          <FilterGroup title="AI Capabilities" groupKey="ai" options={facets.aiCapabilities} open={true} />
+          <FilterGroup title="Category" groupKey="category" options={facets.categories} open={false} />
+          <FilterGroup title="Deployment" groupKey="deployment" options={facets.deployment} open={false} />
           <FilterGroup title="Workflow Stage" groupKey="workflow" options={facets.workflowStages} open={false} />
           <FilterGroup title="Analysis & Detection" groupKey="detection" options={facets.detectionTypes} searchable={true} open={false} />
-          <FilterGroup title="AI Capabilities" groupKey="ai" options={facets.aiCapabilities} open={false} />
           <FilterGroup title="Compliance & Governance" groupKey="compliance" options={facets.complianceBool} open={false} />
           <FilterGroup title="Certifications" groupKey="certifications" options={facets.certifications} searchable={true} open={false} />
           <FilterGroup title="API & CLI Access" groupKey="apicli" options={facets.apiCli} open={false} />
@@ -149,7 +148,6 @@ const OR_WITHIN_GROUP = ["category", "pricetransparency"];
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  data-pricetransparency={t.priceTransparency}
                   data-languages={pipeStr(t.languages)}
                   data-certifications={pipeStr(t.certifications)}
                   data-ides={pipeStr(t.ides)}
@@ -170,9 +168,6 @@ const OR_WITHIN_GROUP = ["category", "pricetransparency"];
                     </div>
                   </div>
                   <p class="tool-desc">{t.description}</p>
-                  <div class="tool-tags">
-                    {t.tags.map((tag) => <span class="pill">{tag}</span>)}
-                  </div>
                   <div class="tool-footer">
                     <span class="tool-price">{t.priceLabel}</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
