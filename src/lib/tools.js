@@ -147,6 +147,7 @@ const VALUE_SYNONYMS = {
   "jira server": "Jira",
   "jira (cloud and server)": "Jira",
   "github issues": "GitHub Issues",
+  phpstorm: "PhpStorm",
 };
 
 function normalizeListValue(raw) {
