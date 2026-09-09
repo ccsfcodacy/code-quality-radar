@@ -32,6 +32,14 @@ const officialSite = websiteFor(slug);
 function ok(v) {
   return v === "yes" || v === "partial";
 }
+// Several free-text fields (best_fit_team_size, minimum_seats, trial, plan price/who_for)
+// fall back to the literal string "unknown" when a vendor doesn't document them — never
+// render that raw, since it reads as a broken page rather than an honest gap.
+function known(v) {
+  if (!v) return false;
+  if (typeof v === "string") return v.trim().toLowerCase() !== "unknown";
+  return true;
+}
 // Never let a partial implementation read as full support in generated copy.
 function mark(label, v) {
   if (v === "yes") return label;
@@ -54,7 +62,7 @@ const faqs = [
   {
     q: `When should you choose ${tool.name}?`,
     a: `${tool.name} best fits ${joinList(buyerLabels, 5) || "teams evaluating this category"}${
-      tool.fit_signals?.best_fit_team_size ? `, ${tool.fit_signals.best_fit_team_size}.` : "."
+      known(tool.fit_signals?.best_fit_team_size) ? `, ${tool.fit_signals.best_fit_team_size}.` : "."
     }${tool.fit_signals?.notable_strengths?.[0] ? ` ${tool.fit_signals.notable_strengths[0]}` : ""}`,
   },
   {
@@ -243,13 +251,13 @@ const jsonLdFaq = {
     <section class="detail-section">
       <div class="detail-section-head">
         <h2 class="h2">Pricing &amp; plans</h2>
-        {tool.commercial?.entry_paid_price && tool.commercial.entry_paid_price !== "unknown" && (
+        {known(tool.commercial?.entry_paid_price) && (
           <p class="text-secondary" style="margin-top: var(--space-xs);">{tool.commercial.entry_paid_price}</p>
         )}
-        {tool.commercial?.minimum_seats && (
+        {known(tool.commercial?.minimum_seats) && (
           <p class="caption" style="margin-top: var(--space-xs);">Minimum seats: {tool.commercial.minimum_seats}</p>
         )}
-        {tool.commercial?.trial && tool.commercial.trial !== "unknown" && (
+        {known(tool.commercial?.trial) && (
           <p class="caption" style="margin-top: var(--space-xs);">Trial: {typeof tool.commercial.trial === "string" ? tool.commercial.trial : tool.commercial.trial.note}</p>
         )}
       </div>
@@ -258,8 +266,8 @@ const jsonLdFaq = {
           {tool.commercial.plans.map((plan) => (
             <div class="plan-card">
               <span class="plan-name">{plan.name}</span>
-              <span class="plan-price">{plan.price}</span>
-              {plan.who_for && <span class="plan-who">{plan.who_for}</span>}
+              <span class="plan-price">{known(plan.price) ? plan.price : "Contact for pricing"}</span>
+              {known(plan.who_for) && <span class="plan-who">{plan.who_for}</span>}
               {plan.key_inclusions?.length > 0 && (
                 <ul class="plan-list">
                   {plan.key_inclusions.map((i) => <li>{i}</li>)}
@@ -280,7 +288,7 @@ const jsonLdFaq = {
       <section class="detail-section">
         <div class="detail-section-head">
           <h2 class="h2">Who it's for</h2>
-          {tool.fit_signals?.best_fit_team_size && (
+          {known(tool.fit_signals?.best_fit_team_size) && (
             <p class="text-secondary" style="margin-top: var(--space-xs);">{tool.fit_signals.best_fit_team_size}</p>
           )}
         </div>
